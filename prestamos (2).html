@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRESTAMOS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts & SweetAlert -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+
+    <style>
+        /* ══ VARIABLES GLOBALES Y TEMA ══ */
+        :root {
+            --bg:       #f8fafc;
+            --surface:  #f1f5f9;
+            --card:     #ffffff;
+            --border:   #e2e8f0;
+            --accent:   #4A0072;
+            --accent2:  #D500F9;
+            --success:  #16a34a;
+            --danger:   #dc2626;
+            --text:     #1e293b;
+            --muted:    #64748b;
+            --input-bg: #f8fafc;
+        }
+
+        body.dark-mode {
+            --bg:       #12021F;
+            --surface:  #1E0635;
+            --card:     #22053D;
+            --border:   #311847;
+            --accent:   #FFD700;
+            --accent2:  #EA80FC;
+            --success:  #2dca72;
+            --danger:   #f7614f;
+            --text:     #FFFFFF;
+            --muted:    #8F829C;
+            --input-bg: #12021F;
+            
+            background-color: #12021F !important;
+            color: #D1C8D9 !important;
+        }
+        body.dark-mode .bg-slate-50  { background-color: #12021F !important; }
+        body.dark-mode .bg-white     { background-color: #1E0635 !important; }
+        body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { border-color: #311847 !important; }
+        body.dark-mode .text-slate-800, body.dark-mode .text-slate-700,
+        body.dark-mode .text-slate-900  { color: #FFFFFF !important; }
+        body.dark-mode .text-slate-500, body.dark-mode .text-slate-400 { color: #8F829C !important; }
+        body.dark-mode .bg-slate-100 { background-color: #1A032E !important; }
+        body.dark-mode .tab-bar      { border-color: #311847; background: #12021F; }
+        body.dark-mode .tab-btn      { color: #8F829C; }
+        body.dark-mode .tab-btn:hover { color: #D1C8D9; }
+        body.dark-mode .tab-btn.active { color: #FFD700; border-bottom-color: #FFD700; }
+        body.dark-mode .data-table-wrap { background: #1E0635 !important; border-color: #311847 !important; }
+        body.dark-mode .data-table thead th { background: #1A032E !important; color: #8F829C !important; border-color: #311847 !important; }
+        body.dark-mode .data-table tbody tr:not(.group-header-row):hover { background: #260A42 !important; }
+        body.dark-mode .data-table tbody td { border-color: #311847 !important; color: #D1C8D9 !important; }
+        body.dark-mode .table-header { background: #1A032E !important; border-color: #311847 !important; }
+        body.dark-mode .e-card { background: #1E0635 !important; border-color: #311847 !important; }
+        body.dark-mode .e-input, body.dark-mode .e-select { background: #12021F !important; border-color: #311847 !important; color: #FFFFFF !important; }
+        body.dark-mode .e-label { color: #8F829C !important; }
+        body.dark-mode input[type="text"], body.dark-mode input[type="search"], body.dark-mode input[type="number"], body.dark-mode input[type="date"] { background: #12021F; border-color: #311847; color: #FFFFFF; }
+        body.dark-mode .group-header-row { background: #1A032E !important; }
+        body.dark-mode .group-header-row td { border-color: #311847 !important; color: #FFD700 !important; border-top-color: #311847 !important; }
+
+        * { box-sizing: border-box; }
+        
+        body, input, select, button, table, td, th { 
+            font-family: 'Sora', sans-serif; 
+            font-size: 0.88rem;
+        }
+        body { background-color: var(--bg); color: var(--text); transition: background-color 0.3s, color 0.3s; }
+
+        .t-header { 
+            font-size: 0.72rem !important; 
+            font-weight: 600 !important; 
+            text-transform: uppercase; 
+            color: var(--muted); 
+            letter-spacing: 0.06em; 
+            padding: 0.85rem 1rem !important;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            text-align: left;
+        }
+        .t-cell { 
+            font-size: 0.88rem !important; 
+            color: var(--text); 
+            padding: 0.6rem 1rem !important; 
+            border-bottom: 1px solid var(--border); 
+            vertical-align: middle; 
+        }
+
+        .monto-oscuro { color: #022c22 !important; font-weight: 800 !important; }
+        body.dark-mode .monto-oscuro {
+            color: #022c22 !important; background-color: #a7f3d0 !important; 
+            padding: 2px 6px; border-radius: 6px; display: inline-block;
+        }
+
+        /* ── Login Overlay ── */
+        #loginOverlay {
+            position: fixed; inset: 0; z-index: 10000; background: var(--bg);
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        #loginOverlay.hidden-login { display: none; }
+        #loginOverlay .login-box {
+            background: var(--card); padding: 2rem; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08); width: 320px; text-align: center;
+            border: 1px solid var(--border);
+        }
+        #loginOverlay h2 { margin-bottom: 1.5rem; font-size: 1.4rem; font-weight: 700; color: var(--text); }
+        #loginOverlay input {
+            width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid var(--border);
+            border-radius: 10px; font-size: .88rem; outline: none; background: var(--input-bg); color: var(--text);
+        }
+        #loginOverlay input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,0,114,.1); }
+        #loginOverlay button {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
+            border: none; border-radius: 10px; cursor: pointer;
+            font-size: .95rem; font-weight: 700; transition: opacity .2s, transform .15s;
+        }
+        #loginOverlay button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* ── TABS ── */
+        .tab-bar::-webkit-scrollbar { display: none; }
+        .tab-bar { border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; margin-bottom: 1.5rem; justify-content: space-between; }
+        .tab-btn {
+            padding: .75rem 1rem; font-size: .72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .07em; cursor: pointer; border: none; background: none; color: var(--muted);
+            border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .2s, border-color .2s;
+            white-space: nowrap; flex-shrink: 0; min-height: 44px; display: flex; align-items: center;
+        }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-panel { display: none; position: relative; min-height: 400px; }
+        .tab-panel.active { display: block; }
+        .tab-panel::before, .tab-panel::after {
+            content: ''; position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; pointer-events: none; z-index: 0;
+        }
+        .tab-panel::before { width: 400px; height: 400px; background: var(--accent); top: -80px; left: -80px; }
+        .tab-panel::after  { width: 350px; height: 350px; background: var(--accent2); bottom: -60px; right: -60px; }
+
+        .logout-btn {
+            display: flex; align-items: center; gap: .4rem; padding: .45rem .9rem; background: none;
+            border: 1.5px solid var(--border); border-radius: 999px; font-size: .68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+            cursor: pointer; transition: border-color .15s, color .15s; min-height: 36px;
+            white-space: nowrap; align-self: center; margin-bottom: 4px;
+        }
+        .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+        body.dark-mode .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+        /* ── COMPONENTES GLOBALES ── */
+        .r-wrapper { width: 100%; position: relative; z-index: 1; margin: 0 auto; }
+        .r-wrapper-sm { max-width: 520px; }
+        .r-wrapper-lg { max-width: 100%; }
+        .r-header { margin-bottom: 1.5rem; }
+        .r-tag {
+            font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .18em;
+            text-transform: uppercase; color: var(--accent); margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; font-weight: 700;
+        }
+        .r-tag::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: rPulse 2s infinite; }
+        .r-header h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.03em; line-height: 1.2; color: var(--text); }
+        .r-header p { margin-top: .4rem; color: var(--muted); font-size: .88rem; font-weight: 300; }
+        .r-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.75rem; position: relative; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,.03);
+        }
+        .r-card-table { padding: 0; overflow: hidden; }
+        .r-field { margin-bottom: 1rem; }
+        .r-label { display: block; font-size: .72rem; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .35rem; }
+        .r-input, .r-select {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+            border-radius: 10px; padding: .75rem 1rem; color: var(--text);
+            font-size: .88rem; transition: border-color .2s, box-shadow .2s; outline: none;
+            appearance: none; -webkit-appearance: none; min-height: 44px;
+        }
+        .r-input::placeholder { color: var(--muted); opacity: .6; }
+        .r-input:focus, .r-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,0,114,.12); }
+        .r-select option { background: var(--card); color: var(--text); }
+        .r-select-wrap { position: relative; }
+        .r-select-wrap::after { content: '▾'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: .8rem; }
+        
+        /* ── MODAL & GENERAL DRAG & DROP ── */
+        .drop-zone {
+            width: 100%; height: 140px; padding: 25px; display: flex; align-items: center; justify-content: center;
+            text-align: center; font-weight: 500; font-size: 0.9rem; cursor: pointer; color: var(--muted);
+            border: 2px dashed var(--border); border-radius: 10px; background: var(--input-bg); transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .drop-zone:hover { border-color: var(--accent); }
+        .drop-zone--over { border-style: solid; border-color: var(--accent); background: rgba(74,0,114,.05); }
+        body.dark-mode .drop-zone--over { background: rgba(255,215,0,.05); }
+        .drop-zone__input { display: none; }
+        .drop-zone__thumb { 
+            width: 100%; height: 100%; border-radius: 10px; overflow: hidden; background-color: var(--card); 
+            background-size: contain; background-repeat: no-repeat; background-position: center; 
+            position: absolute; top: 0; left: 0; z-index: 10;
+        }
+        .drop-zone__thumb::after { 
+            content: attr(data-label); position: absolute; bottom: 0; left: 0; width: 100%; 
+            padding: 5px 0; color: #ffffff; background: rgba(0, 0, 0, 0.75); font-size: 11px; text-align: center; 
+        }
+
+        .img-preview-btn { 
+            display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; 
+            font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: none;
+        }
+        .img-preview-btn.btn-pink { background: var(--accent2); color: #fff; }
+        .img-preview-btn.btn-pink:hover { opacity: 0.9; transform: translateY(-2px); }
+        .img-preview-btn.empty { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+        .img-preview-btn.empty:hover { background: var(--border); transform: translateY(-2px); }
+
+        body.dark-mode .img-preview-btn.btn-pink { color: var(--bg); font-weight: 700; }
+        body.dark-mode .img-preview-btn.empty { background: var(--surface); border-color: var(--border); color: var(--muted); }
+
+        /* ── SWAL IMAGEN GRANDE ── */
+        .swal-modal.swal-large-image {
+            width: 90vw !important;
+            max-width: 1200px !important;
+            background: var(--card);
+        }
+        .swal-large-image .swal-content { margin: 0; padding: 0; }
+        .swal-large-image .swal-content img {
+            max-height: 80vh; width: auto; max-width: 100%;
+            margin: 0 auto; display: block; object-fit: contain; border-radius: 8px;
+        }
+
+        .r-btn-wrap { margin-top: 1.75rem; }
+        .r-btn {
+            width: 100%; padding: .9rem 1.5rem; border: none; border-radius: 12px;
+            font-size: .88rem; font-weight: 600; cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff; transition: opacity .2s, transform .15s, box-shadow .2s; min-height: 48px;
+        }
+        .r-btn:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .r-btn:active { transform: translateY(0); }
+        .r-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+        .r-btn-inner { display: flex; align-items: center; justify-content: center; gap: .6rem; }
+        .r-spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.3); border-top-color: transparent; border-radius: 50%; animation: rSpin .7s linear infinite; display: none; }
+
+        .btn-action {
+            display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+            padding: .6rem 1.2rem; border-radius: 10px; font-weight: 600; font-size: .88rem; cursor: pointer;
+            transition: all 0.2s; border: none; min-height: 44px;
+        }
+        .btn-purple { background: var(--accent); color: #fff; }
+        .btn-purple:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-pink { background: var(--accent2); color: #fff; }
+        .btn-pink:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-dark { background: #1e293b; color: #fff; }
+        .btn-dark:hover { background: #0f172a; transform: translateY(-1px); }
+        .btn-light { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+        .btn-light:hover { background: var(--border); }
+
+        body.dark-mode .btn-purple { background: var(--accent); color: var(--bg); font-weight: 700; }
+        body.dark-mode .btn-pink { background: var(--accent2); color: var(--bg); font-weight: 700; }
+        body.dark-mode .btn-dark { background: var(--text); color: var(--bg); font-weight: 700; }
+        body.dark-mode .btn-light { background: var(--surface); color: var(--text); border-color: var(--border); }
+
+        .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+        @media (max-width: 767px) { .edit-grid { grid-template-columns: 1fr; } }
+
+        /* ── TABLA ESTILO CARD PARA MÓVIL (DASHBOARD) ── */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .group-header-row { background: var(--surface); }
+        .group-header-row td { color: var(--accent); border-top: 1px solid var(--border); }
+
+        @media (max-width: 767px) {
+            .data-table thead { display: none; }
+            .data-table tbody tr:not(.group-header-row) {
+                display: block; background: var(--card); border: 1px solid var(--border);
+                border-radius: 12px; margin-bottom: .75rem; padding: 1rem;
+            }
+            .data-table tbody tr:not(.group-header-row) td {
+                display: flex; padding: .3rem 0 !important; border: none; justify-content: space-between; align-items: center; text-align: right;
+            }
+            .data-table tbody tr:not(.group-header-row) td::before {
+                content: attr(data-label); font-size: .6rem; font-weight: 700; text-transform: uppercase;
+                letter-spacing: .07em; color: var(--muted); min-width: 90px; text-align: left; margin-top: 2px;
+            }
+            .data-table tbody tr.group-header-row {
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 12px; border: 1px solid var(--border);
+            }
+            .data-table tbody tr.group-header-row td { display: block; padding: 0 !important; border: none !important; }
+            .data-table tbody tr.group-header-row td:empty { display: none; }
+        }
+
+        /* ── HOJA DE CÁLCULO (Spreadsheet) ── */
+        .ss-table { width: 100%; border-collapse: collapse; }
+        
+        .ss-input, .ss-select {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem; border-radius: 10px; font-size: 0.88rem;
+            color: var(--text); transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
+        }
+        .ss-select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1em; padding-right: 2rem;
+        }
+        .ss-input:focus, .ss-select:focus { outline: none; border-color: var(--accent); background: var(--card); box-shadow: 0 0 0 3px rgba(74,0,114,.12); }
+        
+        .toggle-icon { transition: transform 0.3s ease; }
+        .toggle-icon.open { transform: rotate(180deg); }
+
+        @media (max-width: 767px) {
+            .ss-table thead { display: none; }
+            .ss-table tbody tr[id^="row-main-"] {
+                display: block; background: var(--card); border: 1px solid var(--border);
+                border-top-left-radius: 12px; border-top-right-radius: 12px; padding: 0.75rem 1rem; margin-top: 0.75rem;
+            }
+            .ss-table tbody tr[id^="row-main-"].collapsed { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+            .ss-table tbody tr[id^="row-main-"] td {
+                display: flex; padding: 0.4rem 0 !important; border: none; justify-content: space-between; align-items: center;
+            }
+            .ss-table tbody tr[id^="row-main-"] td::before {
+                content: attr(data-label); font-size: .65rem; font-weight: 700; text-transform: uppercase;
+                color: var(--muted); min-width: 80px; text-align: left;
+            }
+            .ss-table tbody tr[id^="row-details-"] {
+                display: block; background: var(--surface);
+                border-left: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+                border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; margin-bottom: 0.75rem; padding: 1rem;
+            }
+            .ss-table tbody tr[id^="row-details-"].hidden { display: none !important; }
+            .ss-table tbody tr[id^="row-details-"] td { display: block; padding: 0 !important; border: none; }
+            .ss-table tbody tr[id^="row-main-"] td .ss-input, 
+            .ss-table tbody tr[id^="row-main-"] td .ss-select { width: 60%; text-align: right; }
+            .ss-table tbody tr[id^="row-main-"] td.toggle-cell {
+                justify-content: center; border-top: 1px dashed var(--border); margin-top: 0.5rem; padding-top: 0.8rem !important; cursor: pointer;
+            }
+            .ss-table tbody tr[id^="row-main-"] td.toggle-cell::before { display: none; }
+        }
+
+        /* ── AUTOCOMPLETE ── */
+        .s-autocomplete-wrap { position: relative; width: 100%; }
+        .s-autocomplete-results {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.1); max-height: 200px; overflow-y: auto; z-index: 300; display: none;
+        }
+        .s-autocomplete-results .s-result-item {
+            padding: .6rem 1rem; cursor: pointer; border-bottom: 1px solid var(--border);
+            font-size: .88rem; color: var(--text); font-weight: 500; transition: background .1s;
+        }
+        .s-autocomplete-results .s-result-item:hover { background: var(--surface); }
+        .s-autocomplete-results .s-result-item:last-child { border-bottom: none; }
+
+        /* ── TOAST ── */
+        .r-toast {
+            position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #1b1f2b; border: 1px solid var(--border); border-radius: 12px;
+            padding: .8rem 1.4rem; font-size: .88rem; font-weight: 500; color: #e8ecf5; display: flex; align-items: center; gap: .75rem; min-width: 240px; max-width: 90vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,.4); transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s; opacity: 0; z-index: 9999; pointer-events: none;
+        }
+        .r-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+        .r-toast .r-toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+        .r-toast.success { border-color: var(--success); }
+        .r-toast.success .r-toast-icon { color: var(--success); }
+        .r-toast.error { border-color: var(--danger); }
+        .r-toast.error .r-toast-icon { color: var(--danger); }
+
+        @keyframes rSpin { to { transform: rotate(360deg); } }
+        @keyframes rPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(74,0,114,.6); }
+            50%      { box-shadow: 0 0 0 5px rgba(74,0,114,0); }
+        }
+        body.dark-mode @keyframes rPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(255,215,0,.6); }
+            50%      { box-shadow: 0 0 0 5px rgba(255,215,0,0); }
+        }
+        @media (max-width: 640px) { .main-content { padding-bottom: 1rem; } }
+    </style>
+</head>
+<body class="p-3 md:p-6">
+
+    <!-- ══ LOGIN OVERLAY ══ -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2>Iniciar Sesión</h2>
+            <input type="text" id="loginUsername" placeholder="Usuario" autocomplete="off">
+            <input type="password" id="loginPassword" placeholder="Contraseña">
+            <button id="loginBtn">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- ══ MODAL SUBIR IMAGEN ══ -->
+    <div id="imageUploadModal" class="hidden fixed inset-0 z-[10000] bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-[#22053D] rounded-xl p-6 w-full max-w-sm border border-slate-200 dark:border-[#311847] shadow-xl relative">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Subir Comprobante</h3>
+            <div id="modal-drop-zone" class="drop-zone mb-4">
+                <span class="drop-zone__prompt">
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-indigo-400"></i>
+                    Arrastra una imagen aquí o<br>haz clic / <b>Ctrl+V</b> para pegar
+                </span>
+                <input type="file" id="modal-file-input" class="drop-zone__input" accept="image/*">
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button onclick="cerrarModalSubirImagen()" class="btn-action btn-light">Cancelar</button>
+                <button id="btn-modal-upload" onclick="procesarSubidaImagen()" class="btn-action btn-purple">
+                    <i class="fa-solid fa-upload"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto main-content">
+        
+        <!-- TABS BAR -->
+        <div class="tab-bar">
+            <div class="flex">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">Explorador</button>
+                <button class="tab-btn" onclick="switchTab('registro')">Nuevo Préstamo</button>
+                <button class="tab-btn" onclick="switchTab('modificar')">MODIFICAR</button>
+                <button class="tab-btn" onclick="switchTab('registro-cuenta')">Nueva Cuenta</button>
+            </div>
+            <button class="logout-btn" onclick="panelLogout()" title="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="hidden sm:inline">Salir</span>
+            </button>
+        </div>
+
+        <!-- PANEL DASHBOARD -->
+        <div id="panel-dashboard" class="tab-panel active">
+            <div class="r-wrapper r-wrapper-lg">
+                <div class="r-header flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4">
+                    <div>
+                        <div class="r-tag">EXPLORADOR</div>
+                        <h2>Dashboard de Préstamos</h2>
+                        <p>Filtros dinámicos, edición de conteo en línea y exportación</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="descargarReporteDetalle(event)" class="btn-action btn-purple">
+                            <i class="fa-solid fa-file-excel"></i> Descargar Detalle
+                        </button>
+                        <button onclick="descargarConsulta(event)" class="btn-action btn-pink">
+                            <i class="fa-solid fa-file-excel"></i> Descargar Consulta
+                        </button>
+                        <button onclick="cargarDatos()" class="btn-action btn-dark">
+                            <i class="fa-solid fa-rotate"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="r-card mb-5">
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 items-end">
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Desde</label>
+                            <input type="date" id="filtro-desde" class="r-input">
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Hasta</label>
+                            <input type="date" id="filtro-hasta" class="r-input">
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Sala</label>
+                            <div class="r-select-wrap">
+                                <select id="filtro-sala" class="r-select">
+                                    <option value="">Todas las salas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Personal (Filtro Sala)</label>
+                            <div class="r-select-wrap">
+                                <select id="filtro-personal" class="r-select">
+                                    <option value="">Todo el personal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Agrupar por</label>
+                            <div class="r-select-wrap">
+                                <select id="agrupar-selector" class="r-select" onchange="renderTablaDashboard()">
+                                    <option value="">Sin Agrupar (Detalle)</option>
+                                    <option value="F01">Analista (F01)</option>
+                                    <option value="F02">Asistente (F02)</option>
+                                    <option value="razon_social">Razón Social</option>
+                                    <option value="orden_razon_social">Orden + R. Social</option>
+                                    <option value="conteo">Fecha de Conteo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Orden</label>
+                            <input type="number" id="filtro-orden" class="r-input" placeholder="Todos" step="1">
+                        </div>
+                        <div class="r-field" style="margin-bottom:0; padding-bottom:0.75rem;">
+                            <label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
+                                <input type="checkbox" id="check-conteo" class="w-4 h-4 rounded" onchange="toggleConteoColumn()" checked>
+                                Mostrar Conteo
+                            </label>
+                        </div>
+                        <div class="col-span-2 md:col-span-4 lg:col-span-7 flex gap-2 justify-end">
+                            <button onclick="aplicarFiltros()" class="btn-action btn-dark w-40">
+                                <i class="fa-solid fa-filter"></i> Filtrar
+                            </button>
+                            <button onclick="limpiarFiltros()" class="btn-action btn-light" title="Limpiar">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mensaje-estado" class="hidden mb-4 p-3 rounded-xl text-xs"></div>
+
+                <div class="r-card r-card-table">
+                    <div class="overflow-x-auto w-full">
+                        <table class="data-table" id="tabla-dashboard">
+                            <thead>
+                                <tr>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" onclick="toggleSort('fecha')">
+                                        Fecha <span class="sort-icon" id="icon-sort-fecha"></span>
+                                    </th>
+                                    <th id="th-conteo" class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 140px;" onclick="toggleSort('conteo')">
+                                        Conteo <span class="sort-icon" id="icon-sort-conteo"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" onclick="toggleSort('sala')">
+                                        Sala <span class="sort-icon" id="icon-sort-sala"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" onclick="toggleSort('origen')">
+                                        Origen <span class="sort-icon" id="icon-sort-origen"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none text-right" onclick="toggleSort('monto')">
+                                        Monto <span class="sort-icon" id="icon-sort-monto"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" onclick="toggleSort('mensaje')">
+                                        Mensaje <span class="sort-icon" id="icon-sort-mensaje"></span>
+                                    </th>
+                                    <th class="t-header text-center">IMG 1</th>
+                                    <th class="t-header text-center">IMG 2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-cuerpo">
+                                <tr>
+                                    <td colspan="8" class="text-center py-8" style="color: var(--muted)">
+                                        <i class="fa-solid fa-spinner fa-spin text-xl mb-1.5 block" style="color: var(--accent)"></i>
+                                        Cargando registros...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL REGISTRO PRÉSTAMO -->
+        <div id="panel-registro" class="tab-panel">
+            <div class="r-wrapper r-wrapper-sm">
+                <div class="r-header text-center">
+                    <div class="r-tag justify-center">NUEVO REGISTRO</div>
+                    <h2>Agregar Préstamo</h2>
+                    <p>Ingresa los detalles del nuevo préstamo.</p>
+                </div>
+                <form id="form-prestamo" class="r-card" onsubmit="guardarPrestamo(event)">
+                    <div class="r-section">
+                        <div class="r-field">
+                            <label class="r-label">Fecha del Préstamo</label>
+                            <input type="date" id="reg-fecha" class="r-input" required>
+                        </div>
+                        
+                        <div class="r-field mt-4">
+                            <label class="r-label">Personal (F01/F02) - Filtra Sala Destino</label>
+                            <div class="r-select-wrap">
+                                <select id="reg-personal" class="r-select">
+                                    <option value="">Todo el personal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="edit-grid mt-4">
+                            <div class="r-field">
+                                <label class="r-label">Sala Destino</label>
+                                <div class="r-select-wrap">
+                                    <select id="reg-sala" class="r-select" required>
+                                        <option value="">Seleccione sala...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="r-field">
+                                <label class="r-label">Sala Origen</label>
+                                <div class="r-select-wrap">
+                                    <select id="reg-origen" class="r-select" required>
+                                        <option value="">Seleccione origen...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="edit-grid mt-4">
+                            <div class="r-field">
+                                <label class="r-label">Monto</label>
+                                <input type="number" id="reg-monto" class="r-input" placeholder="0" required step="1">
+                            </div>
+                            <div class="r-field">
+                                <label class="r-label">Mensaje (ID o Código)</label>
+                                <input type="number" id="reg-mensaje" class="r-input" placeholder="Opcional" step="1">
+                            </div>
+                        </div>
+
+                        <div class="edit-grid mt-4">
+                            <div class="r-field">
+                                <label class="r-label flex justify-between items-center">
+                                    <span>Cuenta Bancaria (Admin)</span>
+                                </label>
+                                <div class="s-autocomplete-wrap">
+                                    <input type="text" id="reg-cuenta-search" class="r-input" placeholder="Buscar cuenta..." autocomplete="off">
+                                    <input type="hidden" id="reg-cuenta-id">
+                                    <div id="reg-cuenta-results" class="s-autocomplete-results"></div>
+                                </div>
+                                <div id="reg-cuenta-preview" class="text-[15px] font-mono mt-2 font-bold tracking-widest" style="color: var(--accent); min-height: 20px;"></div>
+                            </div>
+                            <div class="r-field">
+                                <label class="r-label">Orden</label>
+                                <input type="number" id="reg-orden" class="r-input" value="1" required step="1">
+                            </div>
+                        </div>
+
+                        <!-- ZONA DE IMAGEN 1 (SOLO IMG) -->
+                        <div class="r-field mt-4">
+                            <label class="r-label">Comprobante (Pegar o Arrastrar imagen)</label>
+                            <div id="drop-zone-registro" class="drop-zone">
+                                <span class="drop-zone__prompt">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2 block text-indigo-400"></i>
+                                    Arrastra una imagen aquí o<br>haz clic / <b>Ctrl+V</b> para pegar
+                                </span>
+                                <input type="file" id="reg-imagen" class="drop-zone__input" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="r-btn-wrap">
+                        <button type="submit" id="btn-guardar" class="r-btn">
+                            <div class="r-btn-inner">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Préstamo
+                                <div id="reg-spinner" class="r-spinner"></div>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- PANEL NUEVA CUENTA -->
+        <div id="panel-registro-cuenta" class="tab-panel">
+            <div class="r-wrapper r-wrapper-sm">
+                <div class="r-header text-center">
+                    <div class="r-tag justify-center">NUEVA ENTIDAD</div>
+                    <h2>Agregar Cuenta</h2>
+                    <p>Registra una cuenta bancaria para asignarla a los préstamos.</p>
+                </div>
+                <form id="form-cuenta" class="r-card" onsubmit="guardarCuenta(event)">
+                    <div class="r-section">
+                        <div class="edit-grid">
+                            <div class="r-field">
+                                <label class="r-label">ID Cuenta</label>
+                                <input type="text" id="reg-cta-id" class="r-input" placeholder="Identificador único" required>
+                            </div>
+                            <div class="r-field">
+                                <label class="r-label">Admin (Titular)</label>
+                                <input type="text" id="reg-cta-admin" class="r-input" placeholder="Nombre completo" required>
+                            </div>
+                        </div>
+                        <div class="edit-grid mt-4">
+                            <div class="r-field">
+                                <label class="r-label">Banco</label>
+                                <input type="text" id="reg-cta-banco" class="r-input" placeholder="Ej. BBVA, BCP">
+                            </div>
+                            <div class="r-field">
+                                <label class="r-label">DNI</label>
+                                <input type="text" id="reg-cta-dni" class="r-input" placeholder="Documento" maxlength="8">
+                            </div>
+                        </div>
+                        <div class="r-field mt-4">
+                            <label class="r-label">Número de Cuenta</label>
+                            <input type="text" id="reg-cta-cuenta" class="r-input" placeholder="Ej. 0011-0057-XXXXXXXX">
+                        </div>
+                    </div>
+                    <div class="r-btn-wrap">
+                        <button type="submit" id="btn-guardar-cta" class="r-btn">
+                            <div class="r-btn-inner">
+                                <i class="fa-solid fa-building-columns"></i> Registrar Cuenta
+                                <div id="reg-cta-spinner" class="r-spinner"></div>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- PANEL MODIFICAR (HOJA DE CÁLCULO) -->
+        <div id="panel-modificar" class="tab-panel">
+            <div class="r-wrapper r-wrapper-lg">
+                <div class="r-header flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4">
+                    <div>
+                        <div class="r-tag">EDICIÓN EN LOTE</div>
+                        <h2>PRESTAMOS</h2>
+                        <p>Busca, despliega las filas para editar detalles y guarda los cambios.</p>
+                    </div>
+                </div>
+
+                <div class="r-card mb-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Desde</label>
+                            <input type="date" id="mod-filtro-desde" class="r-input">
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Hasta</label>
+                            <input type="date" id="mod-filtro-hasta" class="r-input">
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Personal (Filtro Sala)</label>
+                            <div class="r-select-wrap">
+                                <select id="mod-filtro-personal" class="r-select">
+                                    <option value="">Todo el personal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Sala Destino</label>
+                            <div class="r-select-wrap">
+                                <select id="mod-filtro-sala" class="r-select">
+                                    <option value="">Todas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="r-field" style="margin-bottom:0;">
+                            <label class="r-label">Orden</label>
+                            <input type="number" id="mod-filtro-orden" class="r-input" placeholder="Todos" step="1">
+                        </div>
+                        <button type="button" id="btn-buscar-mod" onclick="buscarPrestamosParaModificar(event)" class="btn-action btn-dark w-full h-[44px]">
+                            <i class="fa-solid fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="r-card r-card-table">
+                    <div class="overflow-x-auto w-full">
+                        <table class="ss-table">
+                            <thead>
+                                <tr>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 130px;" onclick="toggleModSort('fecha')">
+                                        Fecha <span class="sort-icon-mod" id="icon-sort-mod-fecha"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 170px;" onclick="toggleModSort('sala')">
+                                        Destino <span class="sort-icon-mod" id="icon-sort-mod-sala"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 170px;" onclick="toggleModSort('origen')">
+                                        Origen <span class="sort-icon-mod" id="icon-sort-mod-origen"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 80px;" onclick="toggleModSort('orden')">
+                                        Orden <span class="sort-icon-mod" id="icon-sort-mod-orden"></span>
+                                    </th>
+                                    <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 120px;" onclick="toggleModSort('monto')">
+                                        Monto <span class="sort-icon-mod" id="icon-sort-mod-monto"></span>
+                                    </th>
+                                    <th class="t-header" style="width: 50px; text-align: center;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="mod-ss-cuerpo">
+                                <tr>
+                                    <td colspan="6" class="text-center py-8" style="color: var(--muted)">
+                                        Utiliza los filtros de arriba para cargar préstamos y modificarlos en línea.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast UI -->
+    <div id="app-toast" class="r-toast">
+        <i id="toast-icon" class="fa-solid fa-circle-check r-toast-icon"></i>
+        <span id="toast-msg">Operación exitosa</span>
+    </div>
+
+    <script>
+        const SB_URL = 'https://wzjyvxeuauseaibvbdqo.supabase.co/rest/v1';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6anl2eGV1YXVzZWFpYnZiZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNTU4OTYsImV4cCI6MjA4NjczMTg5Nn0.4vz8mrugKh2ribm8zgh4_cxhN5rFdAizkzXQgZJLcb8';
+        const AUTH = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` };
+        
+        // API IMGBB
+        const IMGBB_API_KEY = 'bffdb48276fdc1de3efa8086ab81ced9';
+
+        // ==========================
+        // LOGIN LOGIC
+        // ==========================
+        const LOGIN_SB_URL = 'https://wzjyvxeuauseaibvbdqo.supabase.co/rest/v1/usuarios_login';
+        const LOGIN_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6anl2eGV1YXVzZWFpYnZiZHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNTU4OTYsImV4cCI6MjA4NjczMTg5Nn0.4vz8mrugKh2ribm8zgh4_cxhN5rFdAizkzXQgZJLcb8';
+
+        async function loginHashPassword(password) {
+            const data = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+        }
+
+        async function loginSignIn() {
+            const user = document.getElementById('loginUsername').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            if (!user || !pass) { swal({ text: 'Por favor, rellena todos los campos', icon: 'warning' }); return; }
+            const hash = await loginHashPassword(pass);
+            try {
+                const res = await fetch(`${LOGIN_SB_URL}?usuario=eq.${encodeURIComponent(user)}&hash=eq.${hash}`, {
+                    headers: { 'apikey': LOGIN_SB_KEY, 'Authorization': `Bearer ${LOGIN_SB_KEY}`, 'Content-Type': 'application/json' }
+                });
+                const result = await res.json();
+                if (result && result.length > 0) {
+                    localStorage.setItem('panelUser', result[0].usuario);
+                    document.getElementById('loginOverlay').classList.add('hidden-login');
+                    await initApp();
+                } else { swal({ text: 'Usuario o contraseña incorrectos', icon: 'error' }); }
+            } catch(e) { swal({ text: 'Error al conectar con el servidor', icon: 'error' }); }
+        }
+
+        function checkSession() {
+            if (localStorage.getItem('panelUser')) {
+                document.getElementById('loginOverlay').classList.add('hidden-login');
+                initApp();
+            }
+        }
+
+        function panelLogout() {
+            swal({ title: '¿Cerrar sesión?', text: 'Se cerrará tu sesión actual.', icon: 'warning', buttons: ['Cancelar', 'Salir'] })
+                .then(confirm => {
+                    if (confirm) {
+                        localStorage.removeItem('panelUser');
+                        document.getElementById('loginOverlay').classList.remove('hidden-login');
+                        document.getElementById('loginUsername').value = '';
+                        document.getElementById('loginPassword').value = '';
+                    }
+                });
+        }
+
+        document.getElementById('loginBtn').addEventListener('click', loginSignIn);
+        document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') loginSignIn(); });
+        document.getElementById('loginUsername').addEventListener('keydown', e => { if (e.key === 'Enter') loginSignIn(); });
+
+        // ==========================
+        // APP LOGIC
+        // ==========================
+        let cacheSalasHTML = ''; let cacheSalasRegHTML = ''; let cacheSalasModFiltroHTML = '';
+        let cuentasList = []; let cuentasMap = {};
+        window.currentData = []; window.rsMapCache = {}; window.lastMapaAgrupacion = {}; 
+        let globalSalasOptions = '<option value="">Sel...</option>';
+        let globalOrigenOptions = '<option value="">Sel...</option><option value="0">SEDE</option>';
+        
+        let currentSortCol = 'fecha';
+        let currentSortDir = 'desc';
+
+        // Variables Orden Modificar
+        let currentModSortCol = 'fecha';
+        let currentModSortDir = 'desc';
+        window.currentModData = [];
+        
+        let archivoSubir = null; // Para formulario "Nuevo Préstamo"
+        let archivoModal = null; // Para "Modal Subir Imagen"
+        let currentUploadId = null;
+        let currentUploadColumn = 'img'; // Puede ser 'img' o 'img2'
+
+        async function initApp() {
+            await cargarCatalogos();
+            await cargarDatos();
+            document.getElementById('reg-fecha').value = new Date().toISOString().split('T')[0];
+            setupDragAndDropRegistro();
+            setupModalDragAndDrop();
+            actualizarIconosOrden();
+            actualizarIconosOrdenMod();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(`panel-${tabId}`).classList.add('active');
+            if (tabId === 'registro') {
+                const f = document.getElementById('reg-fecha'); if(!f.value) f.value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        function mostrarToast(msg, type) {
+            const toast = document.getElementById('app-toast');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-msg');
+            toast.className = `r-toast ${type} show`; text.textContent = msg;
+            if (type === 'success') { icon.className = 'fa-solid fa-circle-check r-toast-icon'; } 
+            else { icon.className = 'fa-solid fa-triangle-exclamation r-toast-icon'; }
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function formatearMonto(monto) {
+            if (monto === null || monto === undefined) return '-'; return Number(monto).toLocaleString('en-US');
+        }
+
+        // ==========================
+        // LÓGICA ORDENAMIENTO (SORT) EXPLORADOR
+        // ==========================
+        function toggleSort(col) {
+            if (currentSortCol === col) {
+                currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortCol = col;
+                currentSortDir = 'desc';
+            }
+            actualizarIconosOrden();
+            renderTablaDashboard();
+        }
+
+        function actualizarIconosOrden() {
+            document.querySelectorAll('.sort-icon').forEach(el => el.innerHTML = '');
+            const iconHTML = currentSortDir === 'asc' 
+                ? '<i class="fa-solid fa-arrow-up-short-wide text-[10px] ml-1" style="color: var(--accent2)"></i>' 
+                : '<i class="fa-solid fa-arrow-down-short-wide text-[10px] ml-1" style="color: var(--accent2)"></i>';
+            const el = document.getElementById(`icon-sort-${currentSortCol}`);
+            if (el) el.innerHTML = iconHTML;
+        }
+
+        // ==========================
+        // LÓGICA ORDENAMIENTO (SORT) MODIFICAR
+        // ==========================
+        function toggleModSort(col) {
+            if (currentModSortCol === col) {
+                currentModSortDir = currentModSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentModSortCol = col;
+                currentModSortDir = 'desc';
+            }
+            actualizarIconosOrdenMod();
+            renderTablaModificar();
+        }
+
+        function actualizarIconosOrdenMod() {
+            document.querySelectorAll('.sort-icon-mod').forEach(el => el.innerHTML = '');
+            const iconHTML = currentModSortDir === 'asc' 
+                ? '<i class="fa-solid fa-arrow-up-short-wide text-[10px] ml-1" style="color: var(--accent2)"></i>' 
+                : '<i class="fa-solid fa-arrow-down-short-wide text-[10px] ml-1" style="color: var(--accent2)"></i>';
+            const el = document.getElementById(`icon-sort-mod-${currentModSortCol}`);
+            if (el) el.innerHTML = iconHTML;
+        }
+
+        function toggleConteoColumn() {
+            const isChecked = document.getElementById('check-conteo').checked;
+            const th = document.getElementById('th-conteo');
+            if (isChecked) { th.classList.remove('hidden'); } else { th.classList.add('hidden'); }
+            renderTablaDashboard();
+        }
+
+        // ==========================
+        // DRAG & DROP - REGISTRO
+        // ==========================
+        function setupDragAndDropRegistro() {
+            const dropZoneElement = document.getElementById("drop-zone-registro");
+            const inputElement = document.getElementById("reg-imagen");
+            if(!dropZoneElement) return;
+
+            dropZoneElement.addEventListener("click", () => inputElement.click());
+            inputElement.addEventListener("change", () => {
+                if (inputElement.files.length) updateRegistroThumbnail(dropZoneElement, inputElement.files[0]);
+            });
+            dropZoneElement.addEventListener("dragover", e => {
+                e.preventDefault(); dropZoneElement.classList.add("drop-zone--over");
+            });
+            ["dragleave", "dragend"].forEach(type => {
+                dropZoneElement.addEventListener(type, () => dropZoneElement.classList.remove("drop-zone--over"));
+            });
+            dropZoneElement.addEventListener("drop", e => {
+                e.preventDefault(); dropZoneElement.classList.remove("drop-zone--over");
+                if (e.dataTransfer.files.length) {
+                    inputElement.files = e.dataTransfer.files; updateRegistroThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+                }
+            });
+
+            // Soporte Ctrl+V solo cuando la pestaña registro está activa y modal cerrado
+            document.addEventListener('paste', e => {
+                if (!document.getElementById('panel-registro').classList.contains('active')) return;
+                if (!document.getElementById('imageUploadModal').classList.contains('hidden')) return;
+
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (let index in items) {
+                    const item = items[index];
+                    if (item.kind === 'file' && item.type.includes('image/')) {
+                        const blob = item.getAsFile(); const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(blob); inputElement.files = dataTransfer.files;
+                        updateRegistroThumbnail(dropZoneElement, blob);
+                    }
+                }
+            });
+        }
+
+        function updateRegistroThumbnail(dropZoneElement, file) {
+            archivoSubir = file;
+            let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+            if (dropZoneElement.querySelector(".drop-zone__prompt")) {
+                dropZoneElement.querySelector(".drop-zone__prompt").style.display = "none";
+            }
+            if (!thumbnailElement) {
+                thumbnailElement = document.createElement("div");
+                thumbnailElement.classList.add("drop-zone__thumb");
+                dropZoneElement.appendChild(thumbnailElement);
+            }
+            thumbnailElement.dataset.label = file.name || "imagen_pegada.png";
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = () => thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
+            } else { thumbnailElement.style.backgroundImage = null; }
+        }
+
+        function clearDropZoneRegistro() {
+            archivoSubir = null;
+            const dropZone = document.getElementById("drop-zone-registro");
+            if(!dropZone) return;
+            const thumb = dropZone.querySelector(".drop-zone__thumb"); if (thumb) thumb.remove();
+            const prompt = dropZone.querySelector(".drop-zone__prompt"); if (prompt) prompt.style.display = "block";
+            document.getElementById("reg-imagen").value = "";
+        }
+
+        // ==========================
+        // LÓGICA MODAL IMAGEN
+        // ==========================
+        function abrirModalSubirImagen(id_prestamo, columna = 'img') {
+            currentUploadId = id_prestamo;
+            currentUploadColumn = columna;
+            document.getElementById('imageUploadModal').classList.remove('hidden');
+            clearModalDropZone();
+        }
+
+        function cerrarModalSubirImagen() {
+            document.getElementById('imageUploadModal').classList.add('hidden');
+            currentUploadId = null; clearModalDropZone();
+        }
+
+        function setupModalDragAndDrop() {
+            const dropZoneElement = document.getElementById("modal-drop-zone");
+            const inputElement = document.getElementById("modal-file-input");
+
+            dropZoneElement.addEventListener("click", () => inputElement.click());
+            inputElement.addEventListener("change", () => {
+                if (inputElement.files.length) updateModalThumbnail(dropZoneElement, inputElement.files[0]);
+            });
+            dropZoneElement.addEventListener("dragover", e => {
+                e.preventDefault(); dropZoneElement.classList.add("drop-zone--over");
+            });
+            ["dragleave", "dragend"].forEach(type => {
+                dropZoneElement.addEventListener(type, () => dropZoneElement.classList.remove("drop-zone--over"));
+            });
+            dropZoneElement.addEventListener("drop", e => {
+                e.preventDefault(); dropZoneElement.classList.remove("drop-zone--over");
+                if (e.dataTransfer.files.length) {
+                    inputElement.files = e.dataTransfer.files; updateModalThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+                }
+            });
+
+            // Soporte para Ctrl+V en el Modal
+            document.addEventListener('paste', e => {
+                if (document.getElementById('imageUploadModal').classList.contains('hidden')) return;
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (let index in items) {
+                    const item = items[index];
+                    if (item.kind === 'file' && item.type.includes('image/')) {
+                        const blob = item.getAsFile(); const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(blob); inputElement.files = dataTransfer.files;
+                        updateModalThumbnail(dropZoneElement, blob);
+                    }
+                }
+            });
+        }
+
+        function updateModalThumbnail(dropZoneElement, file) {
+            archivoModal = file;
+            let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+            if (dropZoneElement.querySelector(".drop-zone__prompt")) {
+                dropZoneElement.querySelector(".drop-zone__prompt").style.display = "none";
+            }
+            if (!thumbnailElement) {
+                thumbnailElement = document.createElement("div");
+                thumbnailElement.classList.add("drop-zone__thumb");
+                dropZoneElement.appendChild(thumbnailElement);
+            }
+            thumbnailElement.dataset.label = file.name || "imagen_pegada.png";
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = () => thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
+            } else { thumbnailElement.style.backgroundImage = null; }
+        }
+
+        function clearModalDropZone() {
+            archivoModal = null;
+            const dropZone = document.getElementById("modal-drop-zone");
+            const thumb = dropZone.querySelector(".drop-zone__thumb"); if (thumb) thumb.remove();
+            const prompt = dropZone.querySelector(".drop-zone__prompt"); if (prompt) prompt.style.display = "block";
+            document.getElementById("modal-file-input").value = "";
+        }
+
+        async function procesarSubidaImagen() {
+            if (!archivoModal) { mostrarToast('Selecciona o pega una imagen primero', 'error'); return; }
+            const btn = document.getElementById('btn-modal-upload'); const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+
+            try {
+                // 1. Subir a ImgBB
+								// 1. Comprimir la imagen antes de subirla
+								const opcionesCompresion = {
+										maxSizeMB: 0.3, // Máximo 300 KB
+										maxWidthOrHeight: 1200, // Redimensionar si es muy grande
+										useWebWorker: true
+								};
+
+								// Comprimimos el archivo (archivoModal o archivoSubir)
+								const archivoComprimido = await imageCompression(archivoModal, opcionesCompresion);
+
+								// 2. Subir a ImgBB (ahora subirá rapidísimo porque pesa menos de 300KB)
+								const formData = new FormData(); 
+								formData.append('image', archivoComprimido);
+                const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                const dataImg = await resImg.json();
+                if (!dataImg.success) throw new Error("Error al subir imagen a la nube remota.");
+                const imgUrl = dataImg.data.url;
+
+                // 2. Armar payload dinámico según la columna actual (img o img2)
+                const payload = {};
+                payload[currentUploadColumn] = imgUrl;
+
+                // 3. Guardar en Supabase
+                const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${currentUploadId}`, {
+                    method: 'PATCH',
+                    headers: { ...AUTH, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    body: JSON.stringify(payload)
+                });
+
+                if(!res.ok) throw new Error('Error al guardar la URL en la base de datos');
+
+                mostrarToast('Comprobante subido con éxito', 'success');
+                cerrarModalSubirImagen();
+
+                // Actualizar la data actual de DashBoard
+                const idxD = window.currentData.findIndex(x => x.id_prestamo === currentUploadId);
+                if(idxD !== -1) window.currentData[idxD][currentUploadColumn] = imgUrl;
+
+                // Actualizar la data actual de Modificar
+                const idxM = window.currentModData.findIndex(x => x.id_prestamo === currentUploadId);
+                if(idxM !== -1) window.currentModData[idxM][currentUploadColumn] = imgUrl;
+
+                // Refrescar según pestaña activa
+                if (document.getElementById('panel-dashboard').classList.contains('active')) renderTablaDashboard();
+                else if (document.getElementById('panel-modificar').classList.contains('active')) renderTablaModificar();
+
+            } catch (err) {
+                mostrarToast(err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = originalText;
+            }
+        }
+
+        // ==========================
+        // PREVISUALIZAR IMAGEN MODAL (AGRANDADO)
+        // ==========================
+        function verImagen(url) {
+            const img = document.createElement('img'); 
+            img.src = url; 
+            
+            swal({
+                content: img,
+                className: "swal-large-image", // Aplica el estilo grande
+                buttons: { 
+                    cancel: { text: "Cerrar", value: null, visible: true, className: "btn-light" }, 
+                    catch: { text: "Abrir original", value: "open", className: "btn-purple" } 
+                }
+            }).then((value) => { 
+                if (value === "open") window.open(url, '_blank'); 
+            });
+        }
+
+        async function actualizarConteoDashboard(id, nuevaFecha) {
+            try {
+                const payload = { conteo: nuevaFecha || null };
+                const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${id}`, { method: 'PATCH', headers: { ...AUTH, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify(payload) });
+                if(!res.ok) throw new Error('Error al actualizar');
+                mostrarToast('Fecha de conteo actualizada', 'success');
+                const idx = window.currentData.findIndex(x => x.id_prestamo === id); if(idx !== -1) window.currentData[idx].conteo = nuevaFecha || null;
+            } catch(err) { mostrarToast(err.message, 'error'); }
+        }
+
+        async function cargarSalasOriginales(targetId) {
+            const selSala = document.getElementById(targetId);
+            if(targetId === 'filtro-sala' && cacheSalasHTML) { selSala.innerHTML = cacheSalasHTML; return; }
+            if(targetId === 'mod-filtro-sala' && cacheSalasModFiltroHTML) { selSala.innerHTML = cacheSalasModFiltroHTML; return; }
+            try {
+                const resSalas = await fetch(`${SB_URL}/nombre_salas?select=id_sala,nombre_sala&order=nombre_sala.asc`, { headers: AUTH });
+                if (resSalas.ok) {
+                    const salas = await resSalas.json(); let htmlSalas = targetId === 'filtro-sala' ? '<option value="">Todas las salas</option>' : '<option value="">Todas</option>';
+                    salas.forEach(s => htmlSalas += `<option value="${s.id_sala}">${s.nombre_sala}</option>`);
+                    selSala.innerHTML = htmlSalas;
+                    if(targetId === 'filtro-sala') cacheSalasHTML = htmlSalas; if(targetId === 'mod-filtro-sala') cacheSalasModFiltroHTML = htmlSalas;
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function aplicarFiltroPersonalASala(personaId, selectSalaId, defaultOptionText) {
+            const selSala = document.getElementById(selectSalaId); selSala.innerHTML = `<option value="">${defaultOptionText}</option>`;
+            if (!personaId) { cargarSalasOriginales(selectSalaId); return; }
+            try {
+                const resAsig = await fetch(`${SB_URL}/asignacion?id_persona=eq.${personaId}&select=id_sala,nombre_salas:id_sala(nombre_sala)&order=id_sala.asc`, { headers: AUTH });
+                if (resAsig.ok) {
+                    const asignaciones = await resAsig.json(); let htmlAsig = `<option value="">${defaultOptionText}</option>`;
+                    asignaciones.forEach(a => { if (a.nombre_salas) htmlAsig += `<option value="${a.id_sala}">${a.nombre_salas.nombre_sala}</option>`; });
+                    selSala.innerHTML = htmlAsig;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('filtro-personal').addEventListener('change', function() { aplicarFiltroPersonalASala(this.value, 'filtro-sala', 'Todas las salas'); });
+        document.getElementById('mod-filtro-personal').addEventListener('change', function() { aplicarFiltroPersonalASala(this.value, 'mod-filtro-sala', 'Todas'); });
+        document.getElementById('reg-personal').addEventListener('change', async function() {
+            const personaId = this.value; const selRegSala = document.getElementById('reg-sala'); selRegSala.innerHTML = '<option value="">Seleccione sala...</option>';
+            if (!personaId) { if (cacheSalasRegHTML) selRegSala.innerHTML = cacheSalasRegHTML; return; }
+            try {
+                const resAsig = await fetch(`${SB_URL}/asignacion?id_persona=eq.${personaId}&select=id_sala,nombre_salas:id_sala(nombre_sala)&order=id_sala.asc`, { headers: AUTH });
+                if (resAsig.ok) {
+                    const asignaciones = await resAsig.json(); let htmlAsig = '<option value="">Seleccione sala...</option>';
+                    asignaciones.forEach(a => { if (a.nombre_salas) htmlAsig += `<option value="${a.id_sala}">${a.nombre_salas.nombre_sala}</option>`; });
+                    selRegSala.innerHTML = htmlAsig;
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        function setupAutocomplete(inputEl, hiddenEl, resultsEl, previewEl) {
+            inputEl.removeEventListener('input', inputEl._acHandler);
+            const handler = function() {
+                const val = this.value.toLowerCase(); hiddenEl.value = ''; if (previewEl) previewEl.textContent = ''; 
+                if (!val) { resultsEl.style.display = 'none'; return; }
+                const matches = cuentasList.filter(c => c.admin.toLowerCase().includes(val));
+                if (matches.length > 0) {
+                    resultsEl.innerHTML = matches.map(c => `<div class="s-result-item" data-id="${c.id}" data-admin="${c.admin}" data-cuenta="${c.cuenta}">${c.admin}</div>`).join('');
+                    resultsEl.style.display = 'block';
+                } else {
+                    resultsEl.innerHTML = '<div class="s-result-item" style="color: var(--muted); cursor: default;">Sin coincidencias</div>'; resultsEl.style.display = 'block';
+                }
+            };
+            inputEl._acHandler = handler; inputEl.addEventListener('input', handler);
+            resultsEl.removeEventListener('click', resultsEl._acHandler);
+            const resHandler = function(e) {
+                const item = e.target.closest('.s-result-item');
+                if (item && item.dataset.id) {
+                    inputEl.value = item.dataset.admin; hiddenEl.value = item.dataset.id;
+                    if (previewEl && item.dataset.cuenta) previewEl.textContent = '***' + item.dataset.cuenta.slice(-4);
+                    else if (previewEl) previewEl.textContent = '';
+                    resultsEl.style.display = 'none';
+                }
+            };
+            resultsEl._acHandler = resHandler; resultsEl.addEventListener('click', resHandler);
+            inputEl.addEventListener('focus', () => { if(inputEl.value) handler.call(inputEl); });
+        }
+
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.s-autocomplete-results').forEach(res => { const wrap = res.closest('.s-autocomplete-wrap'); if (wrap && !wrap.contains(e.target)) res.style.display = 'none'; });
+        });
+
+        async function cargarCatalogos() {
+            try {
+                const [resSalas, resPersonal, resCuentas, resRs] = await Promise.all([
+                    fetch(`${SB_URL}/nombre_salas?select=id_sala,nombre_sala&order=nombre_sala.asc`, { headers: AUTH }),
+                    fetch(`${SB_URL}/personal?select=id_persona,NOMBRE,cargos!inner(id_cargo)&cargos.id_cargo=in.(F01,F02)&order=NOMBRE.asc`, { headers: AUTH }),
+                    fetch(`${SB_URL}/cuentas?select=id_cuenta,ADMIN,BANCO,CUENTA,DNI&order=ADMIN.asc`, { headers: AUTH }),
+                    fetch(`${SB_URL}/rs_salas?select=id_sala,razon_social(razon_social)`, { headers: AUTH })
+                ]);
+
+                if (resSalas.ok) {
+                    const salas = await resSalas.json();
+                    let htmlSalas = '<option value="">Todas las salas</option>'; let htmlModFiltroSalas = '<option value="">Todas</option>';
+                    let htmlRegSalas = '<option value="">Seleccione sala...</option>'; let htmlRegOrigen = '<option value="">Seleccione origen...</option>';
+                    globalSalasOptions = '<option value="">Sel...</option>'; globalOrigenOptions = '<option value="">Sel...</option><option value="0">SEDE</option>';
+                    if (!salas.some(s => s.id_sala == 0)) htmlRegOrigen += `<option value="0">SEDE</option>`;
+
+                    salas.forEach(s => {
+                        htmlSalas += `<option value="${s.id_sala}">${s.nombre_sala}</option>`; const optHtml = `<option value="${s.id_sala}">${s.nombre_sala}</option>`;
+                        htmlModFiltroSalas += optHtml; htmlRegSalas += optHtml; htmlRegOrigen += optHtml;
+                        if (s.id_sala !== 0) { globalSalasOptions += `<option value="${s.id_sala}">${s.nombre_sala}</option>`; globalOrigenOptions += `<option value="${s.id_sala}">${s.nombre_sala}</option>`; }
+                    });
+                    
+                    const selSala = document.getElementById('filtro-sala'); if(selSala) { selSala.innerHTML = htmlSalas; cacheSalasHTML = htmlSalas; }
+                    const selModFiltroSala = document.getElementById('mod-filtro-sala'); if(selModFiltroSala) { selModFiltroSala.innerHTML = htmlModFiltroSalas; cacheSalasModFiltroHTML = htmlModFiltroSalas; }
+                    const selRegSala = document.getElementById('reg-sala'); if(selRegSala) { selRegSala.innerHTML = htmlRegSalas; cacheSalasRegHTML = htmlRegSalas; }
+                    const selRegOrigen = document.getElementById('reg-origen'); if(selRegOrigen) { selRegOrigen.innerHTML = htmlRegOrigen; selRegOrigen.value = "0"; }
+                }
+                if (resPersonal.ok) {
+                    const personal = await resPersonal.json();
+                    const sels = [document.getElementById('filtro-personal'), document.getElementById('reg-personal'), document.getElementById('mod-filtro-personal')];
+                    sels.forEach(sel => { if(sel) sel.innerHTML = '<option value="">Todo el personal</option>'; });
+                    personal.forEach(p => { const optHtml = `<option value="${p.id_persona}">${p.NOMBRE}</option>`; sels.forEach(sel => { if(sel) sel.insertAdjacentHTML('beforeend', optHtml); }); });
+                }
+                if (resCuentas.ok) {
+                    const cuentas = await resCuentas.json();
+                    cuentasList = cuentas.map(c => ({ id: c.id_cuenta, admin: c.ADMIN, cuenta: c.CUENTA || '', banco: c.BANCO || '', dni: c.DNI || '' }));
+                    cuentasMap = {}; cuentasList.forEach(c => { cuentasMap[c.id] = c; });
+                    setupAutocomplete(document.getElementById('reg-cuenta-search'), document.getElementById('reg-cuenta-id'), document.getElementById('reg-cuenta-results'), document.getElementById('reg-cuenta-preview'));
+                }
+                if (resRs.ok) {
+                    const rsList = await resRs.json(); window.rsMapCache = {}; rsList.forEach(r => { if (r.id_sala && r.razon_social) window.rsMapCache[r.id_sala] = r.razon_social.razon_social; });
+                }
+            } catch (e) { console.error("Error cargando catálogos", e); }
+        }
+
+        async function cargarDatos() {
+            const tbody = document.getElementById('tabla-cuerpo'); const alertBox = document.getElementById('mensaje-estado');
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--muted)"><i class="fa-solid fa-spinner fa-spin text-xl mb-1.5 block" style="color: var(--accent)"></i>Cargando...</td></tr>`;
+            alertBox.classList.add('hidden');
+
+            try {
+                const desde = document.getElementById('filtro-desde').value; const hasta = document.getElementById('filtro-hasta').value;
+                const salaId = document.getElementById('filtro-sala').value; const personaId = document.getElementById('filtro-personal').value;
+                const ordenFiltro = document.getElementById('filtro-orden').value;
+                const agruparPor = document.getElementById('agrupar-selector').value;
+
+                let salasFiltro = null;
+                if (personaId) {
+                    const resAsig = await fetch(`${SB_URL}/asignacion?id_persona=eq.${personaId}&select=id_sala`, { headers: AUTH });
+                    if (resAsig.ok) {
+                        const asig = await resAsig.json(); salasFiltro = asig.map(a => a.id_sala).filter(s => s !== null);
+                        if (salasFiltro.length === 0) salasFiltro = [-1];
+                    }
+                }
+
+                let query = `?select=id_prestamo,fecha,monto,mensaje,cuenta,orden,conteo,img,img2,sala:sala(id_sala,nombre_sala),origen:origen(nombre_sala)&order=fecha.desc,id_prestamo.desc`;
+                if (desde) query += `&fecha=gte.${desde}`; if (hasta) query += `&fecha=lte.${hasta}`;
+                if (salaId) query += `&sala=eq.${salaId}`; if (ordenFiltro) query += `&orden=eq.${ordenFiltro}`;
+                if (salasFiltro) query += `&sala=in.(${salasFiltro.join(',')})`;
+
+                const response = await fetch(`${SB_URL}/prestamos${query}`, { headers: AUTH });
+                if (!response.ok) throw new Error(`Error en la petición: ${response.statusText}`);
+                let data = await response.json(); 
+                
+                window.currentData = data; 
+
+                let mapaAgrupacion = {}; 
+                if (agruparPor === 'F01' || agruparPor === 'F02') {
+                    const resPers = await fetch(`${SB_URL}/personal?select=id_persona,NOMBRE,cargos!inner(id_cargo)&cargos.id_cargo=eq.${agruparPor}`, { headers: AUTH });
+                    if (resPers.ok) {
+                        const listaPersonal = await resPers.json(); const idsPersona = listaPersonal.map(p => p.id_persona);
+                        if (idsPersona.length > 0) {
+                            const resAsig = await fetch(`${SB_URL}/asignacion?id_persona=in.(${idsPersona.join(',')})&select=id_sala,id_persona`, { headers: AUTH });
+                            if (resAsig.ok) {
+                                const listaAsig = await resAsig.json(); const personaMap = {};
+                                listaPersonal.forEach(p => { personaMap[p.id_persona] = p.NOMBRE; });
+                                listaAsig.forEach(a => { if (a.id_sala && personaMap[a.id_persona]) mapaAgrupacion[a.id_sala] = personaMap[a.id_persona]; });
+                            }
+                        }
+                    }
+                } else if (agruparPor === 'razon_social' || agruparPor === 'orden_razon_social') {
+                    if(window.rsMapCache && Object.keys(window.rsMapCache).length > 0) { mapaAgrupacion = window.rsMapCache; }
+                    else {
+                        const resRs = await fetch(`${SB_URL}/rs_salas?select=id_sala,razon_social(razon_social)`, { headers: AUTH });
+                        if (resRs.ok) { const rsList = await resRs.json(); rsList.forEach(r => { if (r.id_sala && r.razon_social) mapaAgrupacion[r.id_sala] = r.razon_social.razon_social; }); }
+                    }
+                }
+                window.lastMapaAgrupacion = mapaAgrupacion;
+
+                renderTablaDashboard(); 
+
+            } catch (error) {
+                alertBox.className = "mb-4 p-3 rounded-xl text-xs flex items-center gap-2";
+                alertBox.style.backgroundColor = 'var(--surface)'; alertBox.style.color = 'var(--danger)'; alertBox.style.borderColor = 'var(--danger)';
+                alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Error al conectar: ${error.message}`;
+                alertBox.classList.remove('hidden');
+                document.getElementById('tabla-cuerpo').innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--danger);">Error al cargar los datos.</td></tr>`;
+            }
+        }
+
+        // DIBUJA EL DASHBOARD
+        function renderTablaDashboard() {
+            const tbody = document.getElementById('tabla-cuerpo');
+            if (!window.currentData || window.currentData.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--muted)">No se encontraron registros.</td></tr>`; return; 
+            }
+
+            const mostrarConteo = document.getElementById('check-conteo').checked;
+            const colSpanGroup = mostrarConteo ? 4 : 3;
+            const hiddenClass = mostrarConteo ? '' : 'hidden';
+            const agruparPor = document.getElementById('agrupar-selector').value;
+
+            window.currentData.sort((a, b) => {
+                let valA, valB;
+                switch(currentSortCol) {
+                    case 'fecha': valA = a.fecha || ''; valB = b.fecha || ''; break;
+                    case 'conteo': valA = a.conteo || ''; valB = b.conteo || ''; break;
+                    case 'sala': valA = a.sala?.nombre_sala || ''; valB = b.sala?.nombre_sala || ''; break;
+                    case 'origen': valA = a.origen?.nombre_sala || ''; valB = b.origen?.nombre_sala || ''; break;
+                    case 'monto': valA = Number(a.monto) || 0; valB = Number(b.monto) || 0; break;
+                    case 'mensaje': valA = a.mensaje || 0; valB = b.mensaje || 0; break;
+                    default: valA = a.id_prestamo; valB = b.id_prestamo; break;
+                }
+                if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            let data = window.currentData;
+
+            if (agruparPor) {
+                let grupos = {}; let totalGeneral = 0;
+                let labelSinGrupo = 'Sin Asignación';
+                if (agruparPor === 'F01') labelSinGrupo = 'Sin Analista Asignado'; if (agruparPor === 'F02') labelSinGrupo = 'Sin Asistente Asignado';
+                if (agruparPor === 'razon_social' || agruparPor === 'orden_razon_social') labelSinGrupo = 'Sin Razón Social Asignada'; if (agruparPor === 'conteo') labelSinGrupo = 'Sin Conteo';
+
+                data.forEach(p => {
+                    let grupoNombre = labelSinGrupo;
+                    if (agruparPor === 'conteo') { grupoNombre = p.conteo ? formatearFecha(p.conteo) : labelSinGrupo; }
+                    else {
+                        const sId = p.sala?.id_sala; let baseGrupo = (sId && window.lastMapaAgrupacion[sId]) ? window.lastMapaAgrupacion[sId] : labelSinGrupo;
+                        grupoNombre = baseGrupo; if (agruparPor === 'orden_razon_social') { const ord = p.orden !== null ? p.orden : 1; grupoNombre = `Orden ${ord} - ${baseGrupo}`; }
+                    }
+                    if (!grupos[grupoNombre]) { grupos[grupoNombre] = { registros: 0, subtotal: 0, items: [] }; }
+                    const m = Number(p.monto) || 0; grupos[grupoNombre].registros += 1; grupos[grupoNombre].subtotal += m; grupos[grupoNombre].items.push(p); totalGeneral += m;
+                });
+
+                let sortedGrupos = Object.entries(grupos);
+                if (agruparPor === 'orden_razon_social') {
+                    sortedGrupos.sort((a, b) => {
+                        const ordA = parseInt(a[0].match(/Orden (\d+)/)?.[1] || 0); const ordB = parseInt(b[0].match(/Orden (\d+)/)?.[1] || 0);
+                        if (ordA !== ordB) return ordA - ordB; return a[0].localeCompare(b[0]);
+                    });
+                } else if (currentSortCol === 'monto') {
+                    sortedGrupos.sort((a,b) => currentSortDir === 'asc' ? a[1].subtotal - b[1].subtotal : b[1].subtotal - a[1].subtotal);
+                } else {
+                    sortedGrupos.sort((a,b) => currentSortDir === 'asc' ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]));
+                }
+
+                let htmlGrupos = '';
+                for (const [resp, grupo] of sortedGrupos) {
+                    htmlGrupos += `
+                        <tr class="group-header-row transition">
+                            <td colspan="${colSpanGroup}" class="py-3 px-4 font-bold flex items-center gap-2 t-cell">
+                                <i class="fa-solid fa-layer-group" style="color: var(--success)"></i> ${resp}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium" style="background: var(--input-bg); color: var(--muted); border: 1px solid var(--border);">
+                                    ${grupo.registros} reg.
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right monto-oscuro t-cell">${formatearMonto(grupo.subtotal)}</td>
+                            <td colspan="3" class="hidden md:table-cell t-cell"></td>
+                        </tr>
+                    `;
+                    grupo.items.forEach(p => {
+                        const iconImg1 = p.img 
+                            ? `<button onclick="verImagen('${p.img}')" class="img-preview-btn btn-pink" title="Ver comprobante 1"><i class="fa-regular fa-image"></i></button>`
+                            : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img')" class="img-preview-btn empty" title="Subir comprobante 1"><i class="fa-solid fa-upload"></i></button>`;
+                        
+                        const iconImg2 = p.img2 
+                            ? `<button onclick="verImagen('${p.img2}')" class="img-preview-btn btn-pink" title="Ver comprobante 2"><i class="fa-regular fa-image"></i></button>`
+                            : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="img-preview-btn empty" title="Subir comprobante 2"><i class="fa-solid fa-upload"></i></button>`;
+
+                        htmlGrupos += `
+                            <tr class="hover:bg-slate-50/80 transition dark:hover:bg-slate-800/50">
+                                <td class="py-2 px-4 t-cell" data-label="Fecha"><div style="padding-left:1rem; border-left:2px solid var(--border);">${formatearFecha(p.fecha)}</div></td>
+                                <td class="py-2 px-4 t-cell ${hiddenClass}" data-label="Conteo">
+                                    <input type="date" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                                           style="color: inherit; font-family: inherit; font-size: 0.88rem;" value="${p.conteo || ''}" onchange="actualizarConteoDashboard(${p.id_prestamo}, this.value)">
+                                </td>
+                                <td class="py-2 px-4 t-cell" data-label="Sala"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.sala?.nombre_sala || 'Sin sala'}</span></td>
+                                <td class="py-2 px-4 t-cell" data-label="Origen"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.origen?.nombre_sala || 'Sin origen'}</span></td>
+                                <td class="py-2 px-4 text-right monto-oscuro t-cell" data-label="Monto">${formatearMonto(p.monto)}</td>
+                                <td class="py-2 px-4 truncate max-w-xs t-cell" style="color: var(--muted);" data-label="Mensaje">${p.mensaje !== null ? p.mensaje : '-'}</td>
+                                <td class="py-2 px-4 text-center t-cell" data-label="IMG 1">${iconImg1}</td>
+                                <td class="py-2 px-4 text-center t-cell" data-label="IMG 2">${iconImg2}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                htmlGrupos += `
+                    <tr class="font-bold group-header-row" style="background: var(--text); color: var(--bg);">
+                        <td colspan="${colSpanGroup}" class="py-3 px-4 text-right uppercase tracking-wider t-cell" style="border-top-color: transparent !important; color: var(--bg);">Total General (${data.length} reg):</td>
+                        <td class="py-3 px-4 text-right monto-oscuro t-cell" style="border-top-color: transparent !important; color: var(--bg) !important; background: transparent !important;">${formatearMonto(totalGeneral)}</td>
+                        <td colspan="3" class="hidden md:table-cell t-cell" style="border-top-color: transparent !important;"></td>
+                    </tr>
+                `;
+                tbody.innerHTML = htmlGrupos;
+
+            } else {
+                let totalGeneral = data.reduce((acc, p) => acc + (Number(p.monto) || 0), 0);
+                let htmlRows = data.map(p => {
+                    const iconImg1 = p.img 
+                        ? `<button onclick="verImagen('${p.img}')" class="img-preview-btn btn-pink" title="Ver comprobante 1"><i class="fa-regular fa-image"></i></button>`
+                        : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img')" class="img-preview-btn empty" title="Subir comprobante 1"><i class="fa-solid fa-upload"></i></button>`;
+                    
+                    const iconImg2 = p.img2 
+                        ? `<button onclick="verImagen('${p.img2}')" class="img-preview-btn btn-pink" title="Ver comprobante 2"><i class="fa-regular fa-image"></i></button>`
+                        : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="img-preview-btn empty" title="Subir comprobante 2"><i class="fa-solid fa-upload"></i></button>`;
+
+                    return `
+                        <tr class="hover:bg-slate-50/80 transition dark:hover:bg-slate-800/50">
+                            <td class="py-2 px-4 t-cell" data-label="Fecha">${formatearFecha(p.fecha)}</td>
+                            <td class="py-2 px-4 t-cell ${hiddenClass}" data-label="Conteo">
+                                <input type="date" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                                       style="color: inherit; font-family: inherit; font-size: 0.88rem;" value="${p.conteo || ''}" onchange="actualizarConteoDashboard(${p.id_prestamo}, this.value)">
+                            </td>
+                            <td class="py-2 px-4 t-cell" data-label="Sala"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.sala?.nombre_sala || 'Sin sala'}</span></td>
+                            <td class="py-2 px-4 t-cell" data-label="Origen"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.origen?.nombre_sala || 'Sin origen'}</span></td>
+                            <td class="py-2 px-4 text-right monto-oscuro t-cell" data-label="Monto">${formatearMonto(p.monto)}</td>
+                            <td class="py-2 px-4 truncate max-w-xs t-cell" style="color: var(--muted);" data-label="Mensaje">${p.mensaje !== null ? p.mensaje : '-'}</td>
+                            <td class="py-2 px-4 text-center t-cell" data-label="IMG 1">${iconImg1}</td>
+                            <td class="py-2 px-4 text-center t-cell" data-label="IMG 2">${iconImg2}</td>
+                        </tr>
+                    `;
+                }).join('');
+                htmlRows += `
+                    <tr class="font-bold group-header-row" style="background: var(--text); color: var(--bg);">
+                        <td colspan="${colSpanGroup}" class="py-3 px-4 text-right uppercase tracking-wider t-cell" style="border-top-color: transparent !important; color: var(--bg);">Total General:</td>
+                        <td class="py-3 px-4 text-right monto-oscuro t-cell" style="border-top-color: transparent !important; color: var(--bg) !important; background: transparent !important;">${formatearMonto(totalGeneral)}</td>
+                        <td colspan="3" class="hidden md:table-cell t-cell" style="border-top-color: transparent !important;"></td>
+                    </tr>
+                `;
+                tbody.innerHTML = htmlRows;
+            }
+        }
+
+        async function guardarPrestamo(e) {
+            e.preventDefault(); const btn = document.getElementById('btn-guardar'); const spinner = document.getElementById('reg-spinner');
+            btn.disabled = true; spinner.style.display = 'block';
+
+            try {
+                let imgUrl = null;
+
+                if (archivoSubir) {
+                    const formData = new FormData(); formData.append('image', archivoSubir);
+                    const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                    const dataImg = await resImg.json();
+                    if (dataImg.success) { imgUrl = dataImg.data.url; } 
+                    else { throw new Error("Error al subir la imagen al servidor remoto."); }
+                }
+
+                const payload = {
+                    fecha: document.getElementById('reg-fecha').value,
+                    sala: parseInt(document.getElementById('reg-sala').value),
+                    origen: parseInt(document.getElementById('reg-origen').value),
+                    monto: parseInt(document.getElementById('reg-monto').value),
+                    mensaje: document.getElementById('reg-mensaje').value ? parseInt(document.getElementById('reg-mensaje').value) : null,
+                    cuenta: document.getElementById('reg-cuenta-id').value || null,
+                    orden: parseInt(document.getElementById('reg-orden').value) || 1,
+                    img: imgUrl
+                };
+
+                const response = await fetch(`${SB_URL}/prestamos`, {
+                    method: 'POST',
+                    headers: { ...AUTH, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) { const err = await response.json(); throw new Error(err.message || 'Error al guardar el préstamo'); }
+
+                mostrarToast('Préstamo guardado exitosamente', 'success');
+                document.getElementById('form-prestamo').reset();
+                document.getElementById('reg-fecha').value = new Date().toISOString().split('T')[0];
+                document.getElementById('reg-origen').value = "0"; document.getElementById('reg-orden').value = "1";
+                document.getElementById('reg-cuenta-id').value = ""; document.getElementById('reg-cuenta-search').value = ""; 
+                document.getElementById('reg-cuenta-preview').textContent = ""; 
+                clearDropZoneRegistro(); 
+
+                if (cacheSalasRegHTML) document.getElementById('reg-sala').innerHTML = cacheSalasRegHTML;
+                cargarDatos(); setTimeout(() => switchTab('dashboard'), 1500);
+
+            } catch (error) { console.error(error); mostrarToast(error.message, 'error');
+            } finally { btn.disabled = false; spinner.style.display = 'none'; }
+        }
+
+        async function guardarCuenta(e) {
+            e.preventDefault(); const btn = document.getElementById('btn-guardar-cta'); const spinner = document.getElementById('reg-cta-spinner');
+            btn.disabled = true; spinner.style.display = 'block';
+            const payload = {
+                id_cuenta: document.getElementById('reg-cta-id').value, ADMIN: document.getElementById('reg-cta-admin').value,
+                BANCO: document.getElementById('reg-cta-banco').value || null, CUENTA: document.getElementById('reg-cta-cuenta').value || null,
+                DNI: document.getElementById('reg-cta-dni').value || null
+            };
+            try {
+                const response = await fetch(`${SB_URL}/cuentas`, {
+                    method: 'POST', headers: { ...AUTH, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify(payload)
+                });
+                if (!response.ok) { const err = await response.json(); throw new Error(err.message || 'Error al guardar la cuenta'); }
+                mostrarToast('Cuenta registrada exitosamente', 'success'); document.getElementById('form-cuenta').reset(); await cargarCatalogos(); 
+            } catch (error) { console.error(error); mostrarToast(error.message, 'error');
+            } finally { btn.disabled = false; spinner.style.display = 'none'; }
+        }
+
+        function toggleModRow(id) {
+            const detailsRow = document.getElementById(`row-details-${id}`); const mainRow = document.getElementById(`row-main-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            if (detailsRow.classList.contains('hidden')) { detailsRow.classList.remove('hidden'); icon.classList.add('open'); mainRow.classList.remove('collapsed'); }
+            else { detailsRow.classList.add('hidden'); icon.classList.remove('open'); mainRow.classList.add('collapsed'); }
+        }
+
+        async function buscarPrestamosParaModificar(e) {
+            let btn = document.getElementById('btn-buscar-mod'); if (e && e.currentTarget) btn = e.currentTarget;
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Buscando...';
+            try {
+                const desde = document.getElementById('mod-filtro-desde').value; const hasta = document.getElementById('mod-filtro-hasta').value;
+                const personaId = document.getElementById('mod-filtro-personal').value; const salaId = document.getElementById('mod-filtro-sala').value;
+                const ordenFiltro = document.getElementById('mod-filtro-orden').value;
+
+                let salasFiltro = null;
+                if (personaId && !salaId) {
+                    const resAsig = await fetch(`${SB_URL}/asignacion?id_persona=eq.${personaId}&select=id_sala`, { headers: AUTH });
+                    if (resAsig.ok) { const asig = await resAsig.json(); salasFiltro = asig.map(a => a.id_sala).filter(s => s !== null); if (salasFiltro.length === 0) salasFiltro = [-1]; }
+                }
+
+                let query = `?select=id_prestamo,fecha,monto,mensaje,cuenta,orden,conteo,img,img2,sala:sala(id_sala,nombre_sala),origen:origen(id_sala,nombre_sala)&order=fecha.desc,id_prestamo.desc`;
+                if (desde) query += `&fecha=gte.${desde}`; if (hasta) query += `&fecha=lte.${hasta}`;
+                if (salaId) query += `&sala=eq.${salaId}`; if (ordenFiltro) query += `&orden=eq.${ordenFiltro}`; else if (salasFiltro) query += `&sala=in.(${salasFiltro.join(',')})`;
+
+                const response = await fetch(`${SB_URL}/prestamos${query}`, { headers: AUTH });
+                if(!response.ok) throw new Error('Error al buscar préstamos');
+                
+                window.currentModData = await response.json(); 
+                
+                renderTablaModificar();
+                mostrarToast(`Cargados ${window.currentModData.length} préstamos para editar`, 'success');
+            } catch(err) { mostrarToast(err.message, 'error'); } finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-search"></i> Buscar'; } }
+        }
+
+        // DIBUJAR TABLA MODIFICAR ORDENADA
+        function renderTablaModificar() {
+            const tbody = document.getElementById('mod-ss-cuerpo'); 
+            tbody.innerHTML = '';
+            
+            if (!window.currentModData || window.currentModData.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6" style="color: var(--muted)">No se encontraron préstamos.</td></tr>'; 
+                return; 
+            }
+
+            // Ordenamiento Cliente Modificar
+            window.currentModData.sort((a, b) => {
+                let valA, valB;
+                switch(currentModSortCol) {
+                    case 'fecha': valA = a.fecha || ''; valB = b.fecha || ''; break;
+                    case 'sala': valA = a.sala?.nombre_sala || ''; valB = b.sala?.nombre_sala || ''; break;
+                    case 'origen': valA = a.origen?.nombre_sala || ''; valB = b.origen?.nombre_sala || ''; break;
+                    case 'orden': valA = Number(a.orden) || 1; valB = Number(b.orden) || 1; break;
+                    case 'monto': valA = Number(a.monto) || 0; valB = Number(b.monto) || 0; break;
+                    default: valA = a.id_prestamo; valB = b.id_prestamo; break;
+                }
+                if (valA < valB) return currentModSortDir === 'asc' ? -1 : 1;
+                if (valA > valB) return currentModSortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            window.currentModData.forEach(p => {
+                const rowSalas = globalSalasOptions.replace(`value="${p.sala?.id_sala}"`, `value="${p.sala?.id_sala}" selected`);
+                const rowOrigen = globalOrigenOptions.replace(`value="${p.origen?.id_sala}"`, `value="${p.origen?.id_sala}" selected`);
+                const cuentaAdmin = p.cuenta && cuentasMap[p.cuenta] ? cuentasMap[p.cuenta].admin : '';
+                const prevCuenta = p.cuenta && cuentasMap[p.cuenta] && cuentasMap[p.cuenta].cuenta ? '***' + cuentasMap[p.cuenta].cuenta.slice(-4) : '';
+                
+                const btnImg1HTML = p.img 
+                    ? `<div class="flex gap-2">
+                         <button type="button" onclick="verImagen('${p.img}')" class="btn-action btn-pink text-xs" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-regular fa-image"></i> Ver</button>
+                         <button type="button" onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img')" class="btn-action btn-light text-xs" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-rotate"></i> Cambiar</button>
+                       </div>`
+                    : `<button type="button" onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img')" class="btn-action btn-light text-xs" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-upload"></i> Subir IMG 1</button>`;
+
+                const btnImg2HTML = p.img2 
+                    ? `<div class="flex gap-2">
+                         <button type="button" onclick="verImagen('${p.img2}')" class="btn-action btn-pink text-xs" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-regular fa-image"></i> Ver</button>
+                         <button type="button" onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="btn-action btn-light text-xs" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-rotate"></i> Cambiar</button>
+                       </div>`
+                    : `<button type="button" onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="btn-action btn-light text-xs" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-upload"></i> Subir IMG 2</button>`;
+
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr id="row-main-${p.id_prestamo}" class="collapsed hover:bg-slate-50 transition dark:hover:bg-slate-800/60 cursor-pointer border-b border-slate-200 dark:border-slate-800" onclick="toggleModRow(${p.id_prestamo})">
+                        <td class="t-cell" data-label="Fecha"><input type="date" class="ss-input mod-in-fecha" value="${p.fecha}" onclick="event.stopPropagation()"></td>
+                        <td class="t-cell" data-label="Destino"><select class="ss-select mod-in-sala" onclick="event.stopPropagation()">${rowSalas}</select></td>
+                        <td class="t-cell" data-label="Origen"><select class="ss-select mod-in-origen" onclick="event.stopPropagation()">${rowOrigen}</select></td>
+                        <td class="t-cell" data-label="Orden"><input type="number" class="ss-input mod-in-orden text-center" value="${p.orden || 1}" step="1" onclick="event.stopPropagation()"></td>
+                        <td class="t-cell" data-label="Monto"><input type="number" class="ss-input mod-in-monto monto-oscuro" value="${p.monto}" step="1" onclick="event.stopPropagation()"></td>
+                        <td class="text-center t-cell toggle-cell"><i id="icon-${p.id_prestamo}" class="fa-solid fa-chevron-down text-slate-400 toggle-icon"></i></td>
+                    </tr>
+                    <tr id="row-details-${p.id_prestamo}" class="hidden bg-slate-50/80 dark:bg-slate-900/40">
+                        <td colspan="6" class="p-4 border-b-2 border-slate-300 dark:border-slate-700">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                                <div class="r-field mb-0">
+                                    <label class="r-label flex justify-between items-center h-[24px]"><span>Conteo</span></label>
+                                    <input type="date" class="ss-input mod-in-conteo" value="${p.conteo||''}">
+                                </div>
+                                <div class="r-field mb-0">
+                                    <label class="r-label flex justify-between items-center h-[24px]"><span>Mensaje (ID)</span></label>
+                                    <input type="number" class="ss-input mod-in-mensaje" value="${p.mensaje||''}" placeholder="Opcional" step="1">
+                                </div>
+                                <div class="r-field mb-0 lg:col-span-2">
+                                    <label class="r-label flex justify-between items-center h-[24px]">
+                                        <span>Cuenta (ADMIN)</span>
+                                    </label>
+                                    <div class="s-autocomplete-wrap mt-1">
+                                        <input type="text" class="ss-input mod-in-cuenta-search" value="${cuentaAdmin}" placeholder="Buscar cuenta..." autocomplete="off">
+                                        <input type="hidden" class="mod-in-cuenta-id" value="${p.cuenta || ''}">
+                                        <div class="s-autocomplete-results mod-cuenta-results"></div>
+                                    </div>
+                                    <div class="cuenta-preview text-[15px] font-mono mt-2 font-bold tracking-widest" style="color: var(--accent); min-height: 20px; margin-left: 0.5rem;">${prevCuenta}</div>
+                                </div>
+                                
+                                <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                    <div class="r-field mb-0 border border-slate-200 dark:border-slate-700 p-2 rounded-lg bg-white dark:bg-[#1E0635]">
+                                        <label class="r-label flex justify-between items-center m-0">
+                                            <span><i class="fa-regular fa-image text-slate-400"></i> IMG 1</span>
+                                            ${btnImg1HTML}
+                                        </label>
+                                    </div>
+                                    <div class="r-field mb-0 border border-slate-200 dark:border-slate-700 p-2 rounded-lg bg-white dark:bg-[#1E0635]">
+                                        <label class="r-label flex justify-between items-center m-0">
+                                            <span><i class="fa-regular fa-image text-slate-400"></i> IMG 2</span>
+                                            ${btnImg2HTML}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <button onclick="eliminarPrestamoFila(${p.id_prestamo})" class="btn-action btn-light text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30" title="Eliminar"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                                <button id="btn-save-${p.id_prestamo}" onclick="actualizarPrestamoFila(${p.id_prestamo})" class="btn-action btn-purple" title="Guardar cambios"><i class="fa-solid fa-save"></i> Guardar Cambios</button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.querySelectorAll('#mod-ss-cuerpo tr[id^="row-details-"]').forEach(row => {
+                if (row.id === '') return;
+                const inputEl = row.querySelector('.mod-in-cuenta-search'); if (!inputEl) return;
+                const hiddenEl = row.querySelector('.mod-in-cuenta-id'); const resultsEl = row.querySelector('.mod-cuenta-results');
+                const previewEl = row.querySelector('.cuenta-preview'); setupAutocomplete(inputEl, hiddenEl, resultsEl, previewEl);
+            });
+        }
+
+        async function actualizarPrestamoFila(id) {
+            const rowMain = document.getElementById(`row-main-${id}`); const rowDetails = document.getElementById(`row-details-${id}`);
+            const btnSave = document.getElementById(`btn-save-${id}`); const iconHTML = btnSave.innerHTML;
+            btnSave.disabled = true; btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            try {
+                const fecha = rowMain.querySelector('.mod-in-fecha').value; const sala = parseInt(rowMain.querySelector('.mod-in-sala').value);
+                const origen = parseInt(rowMain.querySelector('.mod-in-origen').value); const ordenStr = rowMain.querySelector('.mod-in-orden').value;
+                const orden = ordenStr ? parseInt(ordenStr) : 1; const monto = parseInt(rowMain.querySelector('.mod-in-monto').value);
+                const conteo = rowDetails.querySelector('.mod-in-conteo').value || null; const valMensaje = rowDetails.querySelector('.mod-in-mensaje').value;
+                const mensaje = valMensaje ? parseInt(valMensaje) : null; const cuenta = rowDetails.querySelector('.mod-in-cuenta-id').value || null;
+
+                if (!fecha || isNaN(sala) || isNaN(origen) || isNaN(monto)) throw new Error("Datos requeridos incompletos");
+                const payload = { fecha, conteo, sala, origen, orden, monto, mensaje, cuenta };
+
+                const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${id}`, { method: 'PATCH', headers: { ...AUTH, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify(payload) });
+                if(!res.ok) { const err = await res.json(); throw new Error(err.message || 'Error al actualizar'); }
+                
+                mostrarToast('Fila guardada exitosamente', 'success'); rowMain.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'; setTimeout(() => rowMain.style.backgroundColor = '', 1500);
+                
+                // Actualiza info local
+                const idxD = window.currentData.findIndex(x => x.id_prestamo === id);
+                if(idxD !== -1) { Object.assign(window.currentData[idxD], payload); }
+                const idxM = window.currentModData.findIndex(x => x.id_prestamo === id);
+                if(idxM !== -1) { Object.assign(window.currentModData[idxM], payload); }
+
+                toggleModRow(id);
+            } catch(err) { mostrarToast(err.message, 'error'); } finally { btnSave.disabled = false; btnSave.innerHTML = iconHTML; }
+        }
+
+        async function eliminarPrestamoFila(id) {
+            if(!confirm('¿Estás seguro de eliminar este préstamo? Esta acción no se puede deshacer.')) return;
+            const rowMain = document.getElementById(`row-main-${id}`); 
+            const rowDetails = document.getElementById(`row-details-${id}`);
+            
+            try {
+                const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${id}`, { 
+                    method: 'DELETE', 
+                    headers: { ...AUTH, 'Content-Type': 'application/json' } 
+                });
+                
+                // Si la solicitud falla explícitamente en red
+                if(!res.ok) { 
+                    let errorMsg = 'Error al eliminar.';
+                    try { const errObj = await res.json(); errorMsg = errObj.message || errorMsg; } catch(e){}
+                    throw new Error(errorMsg); 
+                }
+                
+                mostrarToast('Préstamo eliminado exitosamente', 'success'); 
+                if (rowMain) rowMain.remove(); 
+                if (rowDetails) rowDetails.remove();
+            } catch(err) { 
+                mostrarToast(err.message, 'error'); 
+            }
+        }
+
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '-'; const partes = fechaStr.split('-'); return partes.length === 3 ? `${partes[2]}/${partes[1]}` : fechaStr;
+        }
+
+        function aplicarFiltros() { cargarDatos(); }
+        function limpiarFiltros() {
+            document.getElementById('filtro-desde').value = ''; document.getElementById('filtro-hasta').value = '';
+            document.getElementById('filtro-sala').value = ''; document.getElementById('filtro-personal').value = '';
+            document.getElementById('filtro-orden').value = ''; document.getElementById('agrupar-selector').value = '';
+            cargarSalasOriginales('filtro-sala'); cargarDatos();
+        }
+
+// ==========================
+        // EXPORTAR EXCEL DETALLE
+        // ==========================
+        function descargarReporteDetalle(event) {
+            if (!window.currentData || window.currentData.length === 0) {
+                mostrarToast('No hay datos para exportar', 'error');
+                return;
+            }
+
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+
+            try {
+                const gruposPorOrden = {};
+
+                window.currentData.forEach(p => {
+                    const orden = p.orden !== null && p.orden !== undefined ? parseInt(p.orden) : 1;
+                    const sId = p.sala?.id_sala;
+                    const rs = window.rsMapCache && window.rsMapCache[sId] ? window.rsMapCache[sId].toUpperCase() : 'OTROS';
+                    const monto = Number(p.monto) || 0;
+
+                    if (!gruposPorOrden[orden]) {
+                        gruposPorOrden[orden] = { subtotal: 0, rsGrupos: {} };
+                    }
+                    if (!gruposPorOrden[orden].rsGrupos[rs]) {
+                        gruposPorOrden[orden].rsGrupos[rs] = { subtotal: 0, items: [] };
+                    }
+
+                    gruposPorOrden[orden].subtotal += monto;
+                    gruposPorOrden[orden].rsGrupos[rs].subtotal += monto;
+                    gruposPorOrden[orden].rsGrupos[rs].items.push(p);
+                });
+
+                let tablaHTML = '<table style="border-collapse: collapse; font-family: \'Arial Narrow\', sans-serif; font-size: 9pt;">';
+                tablaHTML += `
+                    <colgroup>
+                        <col width="18">  <!-- A: 2.57 -->
+                        <col width="110"> <!-- B: 15.71 -->
+                        <col width="92">  <!-- C: 13.14 -->
+                        <col width="219"> <!-- D: 31.29 -->
+                        <col width="74">  <!-- E: 10.57 -->
+                        <col width="168"> <!-- F: 24 -->
+                        <col width="63">  <!-- G: 9 -->
+                    </colgroup>
+                    <tbody>
+                `;
+
+                const ordenesSorted = Object.keys(gruposPorOrden).map(Number).sort((a, b) => a - b);
+
+                ordenesSorted.forEach(orden => {
+                    const dataOrden = gruposPorOrden[orden];
+
+                    tablaHTML += `
+                        <tr>
+                            <td colspan="2" style="font-weight:bold; font-size:11pt; background-color:#dbeafe; color:#1e40af;">TOTAL ${orden}</td>
+                            <td style="font-weight:bold; font-size:11pt; background-color:#dbeafe; color:#1e40af;">${formatearMonto(dataOrden.subtotal)}</td>
+                            <td style="background-color:#dbeafe;"></td><td style="background-color:#dbeafe;"></td><td style="background-color:#dbeafe;"></td><td style="background-color:#dbeafe;"></td>
+                        </tr>
+                    `;
+
+                    const ordenRs = Object.keys(dataOrden.rsGrupos).sort();
+
+                    ordenRs.forEach(rs => {
+                        const grupoRs = dataOrden.rsGrupos[rs];
+
+                        tablaHTML += `
+                            <tr>
+                                <td></td>
+                                <td style="font-weight:bold; background-color:#f8fafc; font-size:10pt;">${rs}</td>
+                                <td style="font-weight:bold; background-color:#f8fafc; font-size:10pt;">${formatearMonto(grupoRs.subtotal)}</td>
+                                <td style="background-color:#f8fafc;"></td>
+                                <td style="background-color:#f8fafc;"></td>
+                                <td style="background-color:#f8fafc;"></td>
+                                <td style="background-color:#f8fafc;"></td>
+                            </tr>
+                        `;
+                        tablaHTML += `
+                            <tr>
+                                <td></td>
+                                <td style="font-weight:bold; background-color:#073763; color:#ffffff; border:1px solid #ccc;">SALA</td>
+                                <td style="font-weight:bold; background-color:#073763; color:#ffffff; border:1px solid #ccc;">MONTO</td>
+                                <td style="font-weight:bold; background-color:#073763; color:#ffffff; border:1px solid #ccc;">TITULAR</td>
+                                <td style="font-weight:bold; background-color:#073763; color:#ffffff; border:1px solid #ccc;">BANCO</td>
+                                <td style="font-weight:bold; background-color:#073763; color:#ffffff; border:1px solid #ccc;">CUENTA</td>
+                                <td style="font-weight:bold; background-color:#073763; color:#ffffff; border:1px solid #ccc;">DNI</td>
+                            </tr>
+                        `;
+
+                        grupoRs.items.sort((a,b) => (b.monto || 0) - (a.monto || 0));
+
+                        grupoRs.items.forEach((p, index) => {
+                            const salaName = p.sala?.nombre_sala || '';
+                            const montoNum = p.monto || 0;
+
+                            let titular = '', banco = '', cuenta = '', dni = '';
+                            if (p.cuenta && cuentasMap[p.cuenta]) {
+                                titular = cuentasMap[p.cuenta].admin || '';
+                                banco = cuentasMap[p.cuenta].banco || '';
+                                cuenta = cuentasMap[p.cuenta].cuenta || '';
+                                let rawDni = cuentasMap[p.cuenta].dni || '';
+                                dni = String(rawDni).padStart(8, '0');
+                            }
+
+                            tablaHTML += `
+                                <tr>
+                                    <td style="border:1px solid #ccc;">${index + 1}</td>
+                                    <td style="border:1px solid #ccc;">${salaName}</td>
+                                    <td style="border:1px solid #ccc; mso-number-format:'\\#\\,\\#\\#0';">${montoNum}</td>
+                                    <td style="border:1px solid #ccc;">${titular}</td>
+                                    <td style="border:1px solid #ccc;">${banco}</td>
+                                    <td style="border:1px solid #ccc; mso-number-format:'\\@';">${cuenta}</td>
+                                    <td style="border:1px solid #ccc; mso-number-format:'\\@';">${dni}</td>
+                                </tr>
+                            `;
+                        });
+
+                        tablaHTML += `<tr><td colspan="7"></td></tr>`;
+                    });
+                });
+
+                tablaHTML += '</tbody></table>';
+
+                const html = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                    <head><meta charset="UTF-8"></head>
+                    <body>${tablaHTML}</body>
+                    </html>
+                `;
+
+                const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Reporte_Detalle_${new Date().toISOString().split('T')[0]}.xls`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error(error);
+                mostrarToast('Error al generar el reporte', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ==========================
+        // EXPORTAR EXCEL CONSULTA
+        // ==========================
+        function descargarConsulta(event) {
+            if (!window.currentData || window.currentData.length === 0) {
+                mostrarToast('No hay datos para exportar', 'error');
+                return;
+            }
+
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+
+            try {
+                const agruparPor = document.getElementById('agrupar-selector').value;
+                let tablaHTML = '<table border="1" style="border-collapse: collapse; font-family: sans-serif; font-size: 10pt;">';
+
+                tablaHTML += `
+                    <thead>
+                        <tr style="background-color: #073763; color: #ffffff; font-weight: bold; text-align: left;">
+                            <th>Fecha</th>
+                            <th>Conteo</th>
+                            <th>Sala</th>
+                            <th>Origen</th>
+                            <th>Orden</th>
+                            <th>Monto</th>
+                            <th>Mensaje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                if (agruparPor) {
+                    let grupos = {};
+                    let totalGeneral = 0;
+                    
+                    let labelSinGrupo = 'Sin Asignación';
+                    if (agruparPor === 'F01') labelSinGrupo = 'Sin Analista Asignado';
+                    if (agruparPor === 'F02') labelSinGrupo = 'Sin Asistente Asignado';
+                    if (agruparPor === 'razon_social' || agruparPor === 'orden_razon_social') labelSinGrupo = 'Sin Razón Social Asignada';
+                    if (agruparPor === 'conteo') labelSinGrupo = 'Sin Conteo';
+
+                    window.currentData.forEach(p => {
+                        let grupoNombre = labelSinGrupo;
+                        if (agruparPor === 'conteo') {
+                            grupoNombre = p.conteo ? formatearFecha(p.conteo) : labelSinGrupo;
+                        } else {
+                            const sId = p.sala?.id_sala;
+                            let baseGrupo = (sId && window.lastMapaAgrupacion[sId]) ? window.lastMapaAgrupacion[sId] : labelSinGrupo;
+                            grupoNombre = baseGrupo;
+                            if (agruparPor === 'orden_razon_social') {
+                                const ord = p.orden !== null ? p.orden : 1;
+                                grupoNombre = `Orden ${ord} - ${baseGrupo}`;
+                            }
+                        }
+
+                        if (!grupos[grupoNombre]) {
+                            grupos[grupoNombre] = { registros: 0, subtotal: 0, items: [] };
+                        }
+                        const m = Number(p.monto) || 0;
+                        grupos[grupoNombre].registros += 1;
+                        grupos[grupoNombre].subtotal += m;
+                        grupos[grupoNombre].items.push(p);
+                        totalGeneral += m;
+                    });
+
+                    let sortedGrupos = Object.entries(grupos);
+                    if (agruparPor === 'orden_razon_social') {
+                        sortedGrupos.sort((a, b) => {
+                            const ordA = parseInt(a[0].match(/Orden (\d+)/)?.[1] || 0);
+                            const ordB = parseInt(b[0].match(/Orden (\d+)/)?.[1] || 0);
+                            if (ordA !== ordB) return ordA - ordB;
+                            return a[0].localeCompare(b[0]);
+                        });
+                    }
+
+                    for (const [resp, grupo] of sortedGrupos) {
+                        tablaHTML += `
+                            <tr style="background-color: #f1f5f9; font-weight: bold;">
+                                <td colspan="5">${resp} (${grupo.registros} reg.)</td>
+                                <td style="mso-number-format:'\\#\\,\\#\\#0'; text-align: right;">${grupo.subtotal}</td>
+                                <td></td>
+                            </tr>
+                        `;
+                        
+                        grupo.items.forEach(p => {
+                            tablaHTML += `
+                                <tr>
+                                    <td>${formatearFecha(p.fecha)}</td>
+                                    <td>${p.conteo ? formatearFecha(p.conteo) : ''}</td>
+                                    <td>${p.sala?.nombre_sala || ''}</td>
+                                    <td>${p.origen?.nombre_sala || ''}</td>
+                                    <td style="text-align: center;">${p.orden !== null ? p.orden : 1}</td>
+                                    <td style="mso-number-format:'\\#\\,\\#\\#0'; text-align: right;">${p.monto || 0}</td>
+                                    <td>${p.mensaje || ''}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    tablaHTML += `
+                        <tr style="background-color: #0f172a; color: #ffffff; font-weight: bold;">
+                            <td colspan="5" style="text-align: right;">Total General (${window.currentData.length} reg):</td>
+                            <td style="mso-number-format:'\\#\\,\\#\\#0'; text-align: right;">${totalGeneral}</td>
+                            <td></td>
+                        </tr>
+                    `;
+                } else {
+                    let totalGeneral = window.currentData.reduce((acc, p) => acc + (Number(p.monto) || 0), 0);
+
+                    window.currentData.forEach(p => {
+                        tablaHTML += `
+                            <tr>
+                                <td>${formatearFecha(p.fecha)}</td>
+                                <td>${p.conteo ? formatearFecha(p.conteo) : ''}</td>
+                                <td>${p.sala?.nombre_sala || ''}</td>
+                                <td>${p.origen?.nombre_sala || ''}</td>
+                                <td style="text-align: center;">${p.orden !== null ? p.orden : 1}</td>
+                                <td style="mso-number-format:'\\#\\,\\#\\#0'; text-align: right;">${p.monto || 0}</td>
+                                <td>${p.mensaje || ''}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tablaHTML += `
+                        <tr style="background-color: #0f172a; color: #ffffff; font-weight: bold;">
+                            <td colspan="5" style="text-align: right;">Total General:</td>
+                            <td style="mso-number-format:'\\#\\,\\#\\#0'; text-align: right;">${totalGeneral}</td>
+                            <td></td>
+                        </tr>
+                    `;
+                }
+
+                tablaHTML += '</tbody></table>';
+
+                const html = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                    <head><meta charset="UTF-8"></head>
+                    <body>${tablaHTML}</body>
+                    </html>
+                `;
+
+                const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Consulta_Prestamos_${new Date().toISOString().split('T')[0]}.xls`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error(error);
+                mostrarToast('Error al generar la consulta', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function guardarPrestamo(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-guardar');
+            const spinner = document.getElementById('reg-spinner');
+            
+            btn.disabled = true;
+            spinner.style.display = 'block';
+
+            const payload = {
+                fecha: document.getElementById('reg-fecha').value,
+                sala: parseInt(document.getElementById('reg-sala').value),
+                origen: parseInt(document.getElementById('reg-origen').value),
+                monto: parseInt(document.getElementById('reg-monto').value),
+                mensaje: document.getElementById('reg-mensaje').value ? parseInt(document.getElementById('reg-mensaje').value) : null,
+                cuenta: document.getElementById('reg-cuenta-id').value || null,
+                orden: parseInt(document.getElementById('reg-orden').value) || 1
+            };
+
+            try {
+                const response = await fetch(`${SB_URL}/prestamos`, {
+                    method: 'POST',
+                    headers: {
+                        ...AUTH,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.message || 'Error al guardar el préstamo');
+                }
+
+                mostrarToast('Préstamo guardado exitosamente', 'success');
+                
+                document.getElementById('form-prestamo').reset();
+                document.getElementById('reg-fecha').value = new Date().toISOString().split('T')[0];
+                document.getElementById('reg-origen').value = "0"; 
+                document.getElementById('reg-orden').value = "1";
+                document.getElementById('reg-cuenta-id').value = ""; 
+                document.getElementById('reg-cuenta-search').value = ""; 
+                document.getElementById('reg-cuenta-preview').textContent = ""; 
+
+                if (cacheSalasRegHTML) {
+                    document.getElementById('reg-sala').innerHTML = cacheSalasRegHTML;
+                }
+                
+                cargarDatos();
+                setTimeout(() => switchTab('dashboard'), 1500);
+
+            } catch (error) {
+                console.error(error);
+                mostrarToast(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function guardarCuenta(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-guardar-cta');
+            const spinner = document.getElementById('reg-cta-spinner');
+            
+            btn.disabled = true;
+            spinner.style.display = 'block';
+
+            const payload = {
+                id_cuenta: document.getElementById('reg-cta-id').value,
+                ADMIN: document.getElementById('reg-cta-admin').value,
+                BANCO: document.getElementById('reg-cta-banco').value || null,
+                CUENTA: document.getElementById('reg-cta-cuenta').value || null,
+                DNI: document.getElementById('reg-cta-dni').value || null
+            };
+
+            try {
+                const response = await fetch(`${SB_URL}/cuentas`, {
+                    method: 'POST',
+                    headers: {
+                        ...AUTH,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.message || 'Error al guardar la cuenta');
+                }
+
+                mostrarToast('Cuenta registrada exitosamente', 'success');
+                document.getElementById('form-cuenta').reset();
+                
+                // Recargar catálogos silente
+                await cargarCatalogos(); 
+
+            } catch (error) {
+                console.error(error);
+                mostrarToast(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+        window.addEventListener('DOMContentLoaded', checkSession);
+    </script>
+</body>
+</html>
