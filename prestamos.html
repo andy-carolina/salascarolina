@@ -963,7 +963,16 @@
             if (isChecked) { th.classList.remove('hidden'); } else { th.classList.add('hidden'); }
             renderTablaDashboard();
         }
-
+		function toggleCuentaColumn() {
+		    const isChecked = document.getElementById('check-cuenta').checked;
+		    const th = document.getElementById('th-cuenta');
+		    if (isChecked) { 
+		        th.classList.remove('hidden'); 
+		    } else { 
+		        th.classList.add('hidden'); 
+		    }
+		    renderTablaDashboard();
+		}
         // ==========================
         // DRAG & DROP - REGISTRO
         // ==========================
@@ -1480,7 +1489,7 @@
                                            style="color: inherit; font-family: inherit; font-size: 0.88rem;" value="${p.conteo || ''}" onchange="actualizarConteoDashboard(${p.id_prestamo}, this.value)">
                                 </td>
 								<td class="py-2 px-4 t-cell ${hiddenCuentaClass}" data-label="Cuenta">
-   								 ${ctaHTML}
+   								 	${ctaHTML}
 								</td>
                                 <td class="py-2 px-4 t-cell" data-label="Sala"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.sala?.nombre_sala || 'Sin sala'}</span></td>
                                 <td class="py-2 px-4 t-cell" data-label="Origen"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.origen?.nombre_sala || 'Sin origen'}</span></td>
