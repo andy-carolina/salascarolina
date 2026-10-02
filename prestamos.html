@@ -491,13 +491,17 @@
                             <label class="r-label">Orden</label>
                             <input type="number" id="filtro-orden" class="r-input" placeholder="Todos" step="1">
                         </div>
-                        <div class="r-field" style="margin-bottom:0; padding-bottom:0.75rem;">
-                            <label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
-                                <input type="checkbox" id="check-conteo" class="w-4 h-4 rounded" onchange="toggleConteoColumn()" checked>
-                                Mostrar Conteo
-                            </label>
-                        </div>
-                        <div class="col-span-2 md:col-span-4 lg:col-span-7 flex gap-2 justify-end">
+                    	<div class="r-field flex flex-col justify-end gap-2" style="margin-bottom:0; padding-bottom:0.75rem;">
+    						<label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
+        						<input type="checkbox" id="check-conteo" class="w-4 h-4 rounded" style="accent-color: var(--accent);" onchange="toggleConteoColumn()" checked>
+        							Mostrar Conteo
+    						</label>
+    						<label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
+        						<input type="checkbox" id="check-cuenta" class="w-4 h-4 rounded" style="accent-color: var(--accent);" onchange="toggleCuentaColumn()">
+        							Mostrar Cuenta
+    						</label>
+						</div>
+						<div class="col-span-2 md:col-span-4 lg:col-span-7 flex gap-2 justify-end">
                             <button onclick="aplicarFiltros()" class="btn-action btn-dark w-40">
                                 <i class="fa-solid fa-filter"></i> Filtrar
                             </button>
@@ -521,6 +525,10 @@
                                     <th id="th-conteo" class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 140px;" onclick="toggleSort('conteo')">
                                         Conteo <span class="sort-icon" id="icon-sort-conteo"></span>
                                     </th>
+									<th id="th-cuenta" class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none hidden" style="min-width: 140px;" onclick="toggleSort('cuenta')">
+ 										   Cuenta <span class="sort-icon" id="icon-sort-cuenta"></span>
+									</th>
+									
                                     <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" onclick="toggleSort('sala')">
                                         Sala <span class="sort-icon" id="icon-sort-sala"></span>
                                     </th>
@@ -1383,9 +1391,14 @@
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--muted)">No se encontraron registros.</td></tr>`; return; 
             }
 
-            const mostrarConteo = document.getElementById('check-conteo').checked;
-            const colSpanGroup = mostrarConteo ? 4 : 3;
-            const hiddenClass = mostrarConteo ? '' : 'hidden';
+			const mostrarConteo = document.getElementById('check-conteo').checked;
+			const mostrarCuenta = document.getElementById('check-cuenta').checked;
+			let colSpanGroup = 3;
+			if (mostrarConteo) colSpanGroup++;
+			if (mostrarCuenta) colSpanGroup++;
+
+			const hiddenClass = mostrarConteo ? '' : 'hidden';
+			const hiddenCuentaClass = mostrarCuenta ? '' : 'hidden';
             const agruparPor = document.getElementById('agrupar-selector').value;
 
             window.currentData.sort((a, b) => {
@@ -1397,6 +1410,7 @@
                     case 'origen': valA = a.origen?.nombre_sala || ''; valB = b.origen?.nombre_sala || ''; break;
                     case 'monto': valA = Number(a.monto) || 0; valB = Number(b.monto) || 0; break;
                     case 'mensaje': valA = a.mensaje || 0; valB = b.mensaje || 0; break;
+					case 'cuenta': valA = a.cuenta && cuentasMap[a.cuenta] ? cuentasMap[a.cuenta].admin.toLowerCase() : ''; valB = b.cuenta && cuentasMap[b.cuenta] ? cuentasMap[b.cuenta].admin.toLowerCase() : ''; break;
                     default: valA = a.id_prestamo; valB = b.id_prestamo; break;
                 }
                 if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
@@ -1465,6 +1479,9 @@
                                     <input type="date" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                                            style="color: inherit; font-family: inherit; font-size: 0.88rem;" value="${p.conteo || ''}" onchange="actualizarConteoDashboard(${p.id_prestamo}, this.value)">
                                 </td>
+								<td class="py-2 px-4 t-cell ${hiddenCuentaClass}" data-label="Cuenta">
+   								 ${ctaHTML}
+								</td>
                                 <td class="py-2 px-4 t-cell" data-label="Sala"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.sala?.nombre_sala || 'Sin sala'}</span></td>
                                 <td class="py-2 px-4 t-cell" data-label="Origen"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.origen?.nombre_sala || 'Sin origen'}</span></td>
                                 <td class="py-2 px-4 text-right monto-oscuro t-cell" data-label="Monto">${formatearMonto(p.monto)}</td>
@@ -1494,7 +1511,9 @@
                     const iconImg2 = p.img2 
                         ? `<button onclick="verImagen('${p.img2}')" class="img-preview-btn btn-pink" title="Ver comprobante 2"><i class="fa-regular fa-image"></i></button>`
                         : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="img-preview-btn empty" title="Subir comprobante 2"><i class="fa-solid fa-upload"></i></button>`;
-
+				const ctaAdmin = p.cuenta && cuentasMap[p.cuenta] ? cuentasMap[p.cuenta].admin : '-';
+				const ctaNum = p.cuenta && cuentasMap[p.cuenta] && cuentasMap[p.cuenta].cuenta ? '***' + cuentasMap[p.cuenta].cuenta.slice(-4) : '';
+				const ctaHTML = ctaAdmin !== '-' ? `<span class="block text-xs font-semibold leading-tight">${ctaAdmin}</span><span class="block text-[10px] font-mono font-bold mt-0.5" style="color: var(--accent)">${ctaNum}</span>` : `<span class="text-xs text-slate-400">Sin cuenta</span>`;
                     return `
                         <tr class="hover:bg-slate-50/80 transition dark:hover:bg-slate-800/50">
                             <td class="py-2 px-4 t-cell" data-label="Fecha">${formatearFecha(p.fecha)}</td>
