@@ -10,7 +10,7 @@
     <!-- Google Fonts & SweetAlert -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet"/>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
 
     <style>
         /* ══ VARIABLES GLOBALES Y TEMA ══ */
@@ -491,17 +491,17 @@
                             <label class="r-label">Orden</label>
                             <input type="number" id="filtro-orden" class="r-input" placeholder="Todos" step="1">
                         </div>
-                    	<div class="r-field flex flex-col justify-end gap-2" style="margin-bottom:0; padding-bottom:0.75rem;">
-    						<label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
-        						<input type="checkbox" id="check-conteo" class="w-4 h-4 rounded" style="accent-color: var(--accent);" onchange="toggleConteoColumn()" checked>
-        							Mostrar Conteo
-    						</label>
-    						<label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
-        						<input type="checkbox" id="check-cuenta" class="w-4 h-4 rounded" style="accent-color: var(--accent);" onchange="toggleCuentaColumn()">
-        							Mostrar Cuenta
-    						</label>
-						</div>
-						<div class="col-span-2 md:col-span-4 lg:col-span-7 flex gap-2 justify-end">
+                        <div class="r-field flex flex-col justify-end gap-2" style="margin-bottom:0; padding-bottom:0.75rem;">
+                            <label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
+                                <input type="checkbox" id="check-conteo" class="w-4 h-4 rounded" style="accent-color: var(--accent);" onchange="toggleConteoColumn()" checked>
+                                Mostrar Conteo
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer font-semibold" style="color: var(--text); font-size: 0.82rem;">
+                                <input type="checkbox" id="check-cuenta" class="w-4 h-4 rounded" style="accent-color: var(--accent);" onchange="toggleCuentaColumn()">
+                                Mostrar Cuenta
+                            </label>
+                        </div>
+                        <div class="col-span-2 md:col-span-4 lg:col-span-7 flex gap-2 justify-end">
                             <button onclick="aplicarFiltros()" class="btn-action btn-dark w-40">
                                 <i class="fa-solid fa-filter"></i> Filtrar
                             </button>
@@ -525,10 +525,10 @@
                                     <th id="th-conteo" class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" style="min-width: 140px;" onclick="toggleSort('conteo')">
                                         Conteo <span class="sort-icon" id="icon-sort-conteo"></span>
                                     </th>
-									<th id="th-cuenta" class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none hidden" style="min-width: 140px;" onclick="toggleSort('cuenta')">
- 										   Cuenta <span class="sort-icon" id="icon-sort-cuenta"></span>
-									</th>
-									
+                                    <th id="th-cuenta" class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none hidden" style="min-width: 140px;" onclick="toggleSort('cuenta')">
+                                        Cuenta <span class="sort-icon" id="icon-sort-cuenta"></span>
+                                    </th>
+                                    
                                     <th class="t-header cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition select-none" onclick="toggleSort('sala')">
                                         Sala <span class="sort-icon" id="icon-sort-sala"></span>
                                     </th>
@@ -547,7 +547,7 @@
                             </thead>
                             <tbody id="tabla-cuerpo">
                                 <tr>
-                                    <td colspan="8" class="text-center py-8" style="color: var(--muted)">
+                                    <td colspan="9" class="text-center py-8" style="color: var(--muted)">
                                         <i class="fa-solid fa-spinner fa-spin text-xl mb-1.5 block" style="color: var(--accent)"></i>
                                         Cargando registros...
                                     </td>
@@ -963,16 +963,18 @@
             if (isChecked) { th.classList.remove('hidden'); } else { th.classList.add('hidden'); }
             renderTablaDashboard();
         }
-		function toggleCuentaColumn() {
-		    const isChecked = document.getElementById('check-cuenta').checked;
-		    const th = document.getElementById('th-cuenta');
-		    if (isChecked) { 
-		        th.classList.remove('hidden'); 
-		    } else { 
-		        th.classList.add('hidden'); 
-		    }
-		    renderTablaDashboard();
-		}
+
+        function toggleCuentaColumn() {
+            const isChecked = document.getElementById('check-cuenta').checked;
+            const th = document.getElementById('th-cuenta');
+            if (isChecked) { 
+                th.classList.remove('hidden'); 
+            } else { 
+                th.classList.add('hidden'); 
+            }
+            renderTablaDashboard();
+        }
+
         // ==========================
         // DRAG & DROP - REGISTRO
         // ==========================
@@ -1125,30 +1127,23 @@
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
 
             try {
-                // 1. Subir a ImgBB
-								// 1. Comprimir la imagen antes de subirla
-								const opcionesCompresion = {
-										maxSizeMB: 0.3, // Máximo 300 KB
-										maxWidthOrHeight: 1200, // Redimensionar si es muy grande
-										useWebWorker: true
-								};
+                const opcionesCompresion = {
+                        maxSizeMB: 0.3,
+                        maxWidthOrHeight: 1200,
+                        useWebWorker: true
+                };
 
-								// Comprimimos el archivo (archivoModal o archivoSubir)
-								const archivoComprimido = await imageCompression(archivoModal, opcionesCompresion);
-
-								// 2. Subir a ImgBB (ahora subirá rapidísimo porque pesa menos de 300KB)
-								const formData = new FormData(); 
-								formData.append('image', archivoComprimido);
+                const archivoComprimido = await imageCompression(archivoModal, opcionesCompresion);
+                const formData = new FormData(); 
+                formData.append('image', archivoComprimido);
                 const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
                 const dataImg = await resImg.json();
                 if (!dataImg.success) throw new Error("Error al subir imagen a la nube remota.");
                 const imgUrl = dataImg.data.url;
 
-                // 2. Armar payload dinámico según la columna actual (img o img2)
                 const payload = {};
                 payload[currentUploadColumn] = imgUrl;
 
-                // 3. Guardar en Supabase
                 const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${currentUploadId}`, {
                     method: 'PATCH',
                     headers: { ...AUTH, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
@@ -1160,15 +1155,12 @@
                 mostrarToast('Comprobante subido con éxito', 'success');
                 cerrarModalSubirImagen();
 
-                // Actualizar la data actual de DashBoard
                 const idxD = window.currentData.findIndex(x => x.id_prestamo === currentUploadId);
                 if(idxD !== -1) window.currentData[idxD][currentUploadColumn] = imgUrl;
 
-                // Actualizar la data actual de Modificar
                 const idxM = window.currentModData.findIndex(x => x.id_prestamo === currentUploadId);
                 if(idxM !== -1) window.currentModData[idxM][currentUploadColumn] = imgUrl;
 
-                // Refrescar según pestaña activa
                 if (document.getElementById('panel-dashboard').classList.contains('active')) renderTablaDashboard();
                 else if (document.getElementById('panel-modificar').classList.contains('active')) renderTablaModificar();
 
@@ -1188,7 +1180,7 @@
             
             swal({
                 content: img,
-                className: "swal-large-image", // Aplica el estilo grande
+                className: "swal-large-image",
                 buttons: { 
                     cancel: { text: "Cerrar", value: null, visible: true, className: "btn-light" }, 
                     catch: { text: "Abrir original", value: "open", className: "btn-purple" } 
@@ -1330,7 +1322,7 @@
 
         async function cargarDatos() {
             const tbody = document.getElementById('tabla-cuerpo'); const alertBox = document.getElementById('mensaje-estado');
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--muted)"><i class="fa-solid fa-spinner fa-spin text-xl mb-1.5 block" style="color: var(--accent)"></i>Cargando...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8" style="color: var(--muted)"><i class="fa-solid fa-spinner fa-spin text-xl mb-1.5 block" style="color: var(--accent)"></i>Cargando...</td></tr>`;
             alertBox.classList.add('hidden');
 
             try {
@@ -1389,7 +1381,7 @@
                 alertBox.style.backgroundColor = 'var(--surface)'; alertBox.style.color = 'var(--danger)'; alertBox.style.borderColor = 'var(--danger)';
                 alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Error al conectar: ${error.message}`;
                 alertBox.classList.remove('hidden');
-                document.getElementById('tabla-cuerpo').innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--danger);">Error al cargar los datos.</td></tr>`;
+                document.getElementById('tabla-cuerpo').innerHTML = `<tr><td colspan="9" class="text-center py-8" style="color: var(--danger);">Error al cargar los datos.</td></tr>`;
             }
         }
 
@@ -1397,17 +1389,17 @@
         function renderTablaDashboard() {
             const tbody = document.getElementById('tabla-cuerpo');
             if (!window.currentData || window.currentData.length === 0) { 
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8" style="color: var(--muted)">No se encontraron registros.</td></tr>`; return; 
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8" style="color: var(--muted)">No se encontraron registros.</td></tr>`; return; 
             }
 
-			const mostrarConteo = document.getElementById('check-conteo').checked;
-			const mostrarCuenta = document.getElementById('check-cuenta').checked;
-			let colSpanGroup = 3;
-			if (mostrarConteo) colSpanGroup++;
-			if (mostrarCuenta) colSpanGroup++;
+            const mostrarConteo = document.getElementById('check-conteo').checked;
+            const mostrarCuenta = document.getElementById('check-cuenta').checked;
+            let colSpanGroup = 3;
+            if (mostrarConteo) colSpanGroup++;
+            if (mostrarCuenta) colSpanGroup++;
 
-			const hiddenClass = mostrarConteo ? '' : 'hidden';
-			const hiddenCuentaClass = mostrarCuenta ? '' : 'hidden';
+            const hiddenClass = mostrarConteo ? '' : 'hidden';
+            const hiddenCuentaClass = mostrarCuenta ? '' : 'hidden';
             const agruparPor = document.getElementById('agrupar-selector').value;
 
             window.currentData.sort((a, b) => {
@@ -1419,7 +1411,7 @@
                     case 'origen': valA = a.origen?.nombre_sala || ''; valB = b.origen?.nombre_sala || ''; break;
                     case 'monto': valA = Number(a.monto) || 0; valB = Number(b.monto) || 0; break;
                     case 'mensaje': valA = a.mensaje || 0; valB = b.mensaje || 0; break;
-					case 'cuenta': valA = a.cuenta && cuentasMap[a.cuenta] ? cuentasMap[a.cuenta].admin.toLowerCase() : ''; valB = b.cuenta && cuentasMap[b.cuenta] ? cuentasMap[b.cuenta].admin.toLowerCase() : ''; break;
+                    case 'cuenta': valA = a.cuenta && cuentasMap[a.cuenta] ? cuentasMap[a.cuenta].admin.toLowerCase() : ''; valB = b.cuenta && cuentasMap[b.cuenta] ? cuentasMap[b.cuenta].admin.toLowerCase() : ''; break;
                     default: valA = a.id_prestamo; valB = b.id_prestamo; break;
                 }
                 if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
@@ -1481,6 +1473,10 @@
                             ? `<button onclick="verImagen('${p.img2}')" class="img-preview-btn btn-pink" title="Ver comprobante 2"><i class="fa-regular fa-image"></i></button>`
                             : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="img-preview-btn empty" title="Subir comprobante 2"><i class="fa-solid fa-upload"></i></button>`;
 
+                        const ctaAdmin = p.cuenta && cuentasMap[p.cuenta] ? cuentasMap[p.cuenta].admin : '-';
+                        const ctaNum = p.cuenta && cuentasMap[p.cuenta] && cuentasMap[p.cuenta].cuenta ? '***' + cuentasMap[p.cuenta].cuenta.slice(-4) : '';
+                        const ctaHTML = ctaAdmin !== '-' ? `<span class="block text-xs font-semibold leading-tight">${ctaAdmin}</span><span class="block text-[10px] font-mono font-bold mt-0.5" style="color: var(--accent)">${ctaNum}</span>` : `<span class="text-xs text-slate-400">Sin cuenta</span>`;
+
                         htmlGrupos += `
                             <tr class="hover:bg-slate-50/80 transition dark:hover:bg-slate-800/50">
                                 <td class="py-2 px-4 t-cell" data-label="Fecha"><div style="padding-left:1rem; border-left:2px solid var(--border);">${formatearFecha(p.fecha)}</div></td>
@@ -1488,9 +1484,9 @@
                                     <input type="date" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                                            style="color: inherit; font-family: inherit; font-size: 0.88rem;" value="${p.conteo || ''}" onchange="actualizarConteoDashboard(${p.id_prestamo}, this.value)">
                                 </td>
-								<td class="py-2 px-4 t-cell ${hiddenCuentaClass}" data-label="Cuenta">
-   								 	${ctaHTML}
-								</td>
+                                <td class="py-2 px-4 t-cell ${hiddenCuentaClass}" data-label="Cuenta">
+                                    ${ctaHTML}
+                                </td>
                                 <td class="py-2 px-4 t-cell" data-label="Sala"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.sala?.nombre_sala || 'Sin sala'}</span></td>
                                 <td class="py-2 px-4 t-cell" data-label="Origen"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.origen?.nombre_sala || 'Sin origen'}</span></td>
                                 <td class="py-2 px-4 text-right monto-oscuro t-cell" data-label="Monto">${formatearMonto(p.monto)}</td>
@@ -1520,15 +1516,20 @@
                     const iconImg2 = p.img2 
                         ? `<button onclick="verImagen('${p.img2}')" class="img-preview-btn btn-pink" title="Ver comprobante 2"><i class="fa-regular fa-image"></i></button>`
                         : `<button onclick="abrirModalSubirImagen(${p.id_prestamo}, 'img2')" class="img-preview-btn empty" title="Subir comprobante 2"><i class="fa-solid fa-upload"></i></button>`;
-				const ctaAdmin = p.cuenta && cuentasMap[p.cuenta] ? cuentasMap[p.cuenta].admin : '-';
-				const ctaNum = p.cuenta && cuentasMap[p.cuenta] && cuentasMap[p.cuenta].cuenta ? '***' + cuentasMap[p.cuenta].cuenta.slice(-4) : '';
-				const ctaHTML = ctaAdmin !== '-' ? `<span class="block text-xs font-semibold leading-tight">${ctaAdmin}</span><span class="block text-[10px] font-mono font-bold mt-0.5" style="color: var(--accent)">${ctaNum}</span>` : `<span class="text-xs text-slate-400">Sin cuenta</span>`;
+                    
+                    const ctaAdmin = p.cuenta && cuentasMap[p.cuenta] ? cuentasMap[p.cuenta].admin : '-';
+                    const ctaNum = p.cuenta && cuentasMap[p.cuenta] && cuentasMap[p.cuenta].cuenta ? '***' + cuentasMap[p.cuenta].cuenta.slice(-4) : '';
+                    const ctaHTML = ctaAdmin !== '-' ? `<span class="block text-xs font-semibold leading-tight">${ctaAdmin}</span><span class="block text-[10px] font-mono font-bold mt-0.5" style="color: var(--accent)">${ctaNum}</span>` : `<span class="text-xs text-slate-400">Sin cuenta</span>`;
+                    
                     return `
                         <tr class="hover:bg-slate-50/80 transition dark:hover:bg-slate-800/50">
                             <td class="py-2 px-4 t-cell" data-label="Fecha">${formatearFecha(p.fecha)}</td>
                             <td class="py-2 px-4 t-cell ${hiddenClass}" data-label="Conteo">
                                 <input type="date" class="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                                        style="color: inherit; font-family: inherit; font-size: 0.88rem;" value="${p.conteo || ''}" onchange="actualizarConteoDashboard(${p.id_prestamo}, this.value)">
+                            </td>
+                            <td class="py-2 px-4 t-cell ${hiddenCuentaClass}" data-label="Cuenta">
+                                ${ctaHTML}
                             </td>
                             <td class="py-2 px-4 t-cell" data-label="Sala"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.sala?.nombre_sala || 'Sin sala'}</span></td>
                             <td class="py-2 px-4 t-cell" data-label="Origen"><span class="inline-flex items-center px-2 py-0.5 rounded font-medium" style="background: var(--input-bg); color: var(--text); border: 1px solid var(--border); font-size: 0.8rem;">${p.origen?.nombre_sala || 'Sin origen'}</span></td>
@@ -1662,7 +1663,6 @@
                 return; 
             }
 
-            // Ordenamiento Cliente Modificar
             window.currentModData.sort((a, b) => {
                 let valA, valB;
                 switch(currentModSortCol) {
@@ -1828,7 +1828,7 @@
             cargarSalasOriginales('filtro-sala'); cargarDatos();
         }
 
-// ==========================
+        // ==========================
         // EXPORTAR EXCEL DETALLE
         // ==========================
         function descargarReporteDetalle(event) {
@@ -2138,112 +2138,6 @@
             }
         }
 
-        async function guardarPrestamo(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-guardar');
-            const spinner = document.getElementById('reg-spinner');
-            
-            btn.disabled = true;
-            spinner.style.display = 'block';
-
-            const payload = {
-                fecha: document.getElementById('reg-fecha').value,
-                sala: parseInt(document.getElementById('reg-sala').value),
-                origen: parseInt(document.getElementById('reg-origen').value),
-                monto: parseInt(document.getElementById('reg-monto').value),
-                mensaje: document.getElementById('reg-mensaje').value ? parseInt(document.getElementById('reg-mensaje').value) : null,
-                cuenta: document.getElementById('reg-cuenta-id').value || null,
-                orden: parseInt(document.getElementById('reg-orden').value) || 1
-            };
-
-            try {
-                const response = await fetch(`${SB_URL}/prestamos`, {
-                    method: 'POST',
-                    headers: {
-                        ...AUTH,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.message || 'Error al guardar el préstamo');
-                }
-
-                mostrarToast('Préstamo guardado exitosamente', 'success');
-                
-                document.getElementById('form-prestamo').reset();
-                document.getElementById('reg-fecha').value = new Date().toISOString().split('T')[0];
-                document.getElementById('reg-origen').value = "0"; 
-                document.getElementById('reg-orden').value = "1";
-                document.getElementById('reg-cuenta-id').value = ""; 
-                document.getElementById('reg-cuenta-search').value = ""; 
-                document.getElementById('reg-cuenta-preview').textContent = ""; 
-
-                if (cacheSalasRegHTML) {
-                    document.getElementById('reg-sala').innerHTML = cacheSalasRegHTML;
-                }
-                
-                cargarDatos();
-                setTimeout(() => switchTab('dashboard'), 1500);
-
-            } catch (error) {
-                console.error(error);
-                mostrarToast(error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                spinner.style.display = 'none';
-            }
-        }
-
-        async function guardarCuenta(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-guardar-cta');
-            const spinner = document.getElementById('reg-cta-spinner');
-            
-            btn.disabled = true;
-            spinner.style.display = 'block';
-
-            const payload = {
-                id_cuenta: document.getElementById('reg-cta-id').value,
-                ADMIN: document.getElementById('reg-cta-admin').value,
-                BANCO: document.getElementById('reg-cta-banco').value || null,
-                CUENTA: document.getElementById('reg-cta-cuenta').value || null,
-                DNI: document.getElementById('reg-cta-dni').value || null
-            };
-
-            try {
-                const response = await fetch(`${SB_URL}/cuentas`, {
-                    method: 'POST',
-                    headers: {
-                        ...AUTH,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.message || 'Error al guardar la cuenta');
-                }
-
-                mostrarToast('Cuenta registrada exitosamente', 'success');
-                document.getElementById('form-cuenta').reset();
-                
-                // Recargar catálogos silente
-                await cargarCatalogos(); 
-
-            } catch (error) {
-                console.error(error);
-                mostrarToast(error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                spinner.style.display = 'none';
-            }
-        }
         window.addEventListener('DOMContentLoaded', checkSession);
     </script>
 </body>
