@@ -2043,8 +2043,8 @@
                             }
                         }
 
-                        if (!grupos[grupoNombre]) {
-                            grupos[grupoNombre] = { registros: 0, subtotal: 0, items: [] };
+                     if (!grupos[grupoNombre]) {
+                            grupos[grupoNombre] = { registros: 0, subtotal: 0, items: [], rawDate: p.conteo || '' };
                         }
                         const m = Number(p.monto) || 0;
                         grupos[grupoNombre].registros += 1;
@@ -2061,7 +2061,17 @@
                             if (ordA !== ordB) return ordA - ordB;
                             return a[0].localeCompare(b[0]);
                         });
-                    }
+                    } else if (agruparPor === 'conteo') {
+                        // Aseguramos que Excel mantenga el orden real cronológico descendente (las más recientes primero)
+                        sortedGrupos.sort((a, b) => {
+                            const dateA = a[1].rawDate || '0000-00-00';
+                            const dateB = b[1].rawDate || '0000-00-00';
+                            return dateB.localeCompare(dateA); 
+                        });
+                    } else {
+                        // Resto de agrupaciones en orden alfabético
+                        sortedGrupos.sort((a, b) => a[0].localeCompare(b[0]));
+                    }  
 
                     for (const [resp, grupo] of sortedGrupos) {
                         tablaHTML += `
