@@ -1434,7 +1434,8 @@
                         const sId = p.sala?.id_sala; let baseGrupo = (sId && window.lastMapaAgrupacion[sId]) ? window.lastMapaAgrupacion[sId] : labelSinGrupo;
                         grupoNombre = baseGrupo; if (agruparPor === 'orden_razon_social') { const ord = p.orden !== null ? p.orden : 1; grupoNombre = `Orden ${ord} - ${baseGrupo}`; }
                     }
-                    if (!grupos[grupoNombre]) { grupos[grupoNombre] = { registros: 0, subtotal: 0, items: [] }; }
+                   // Se agrega rawDate guardando la fecha interna original (YYYY-MM-DD)
+                    if (!grupos[grupoNombre]) { grupos[grupoNombre] = { registros: 0, subtotal: 0, items: [], rawDate: p.conteo || '' }; }
                     const m = Number(p.monto) || 0; grupos[grupoNombre].registros += 1; grupos[grupoNombre].subtotal += m; grupos[grupoNombre].items.push(p); totalGeneral += m;
                 });
 
@@ -1443,6 +1444,14 @@
                     sortedGrupos.sort((a, b) => {
                         const ordA = parseInt(a[0].match(/Orden (\d+)/)?.[1] || 0); const ordB = parseInt(b[0].match(/Orden (\d+)/)?.[1] || 0);
                         if (ordA !== ordB) return ordA - ordB; return a[0].localeCompare(b[0]);
+                    });
+                } else if (agruparPor === 'conteo' && currentSortCol !== 'monto') {
+                    // Ordenar cronológicamente usando rawDate
+                    sortedGrupos.sort((a, b) => {
+                        // Si no hay fecha (Sin Conteo), lo empujamos al final poniéndole una fecha máxima ficticia
+                        const dateA = a[1].rawDate || (currentSortDir === 'asc' ? '9999-12-31' : '0000-00-00');
+                        const dateB = b[1].rawDate || (currentSortDir === 'asc' ? '9999-12-31' : '0000-00-00');
+                        return currentSortDir === 'asc' ? dateA.localeCompare(dateB) : dateB.localeCompare(dateA);
                     });
                 } else if (currentSortCol === 'monto') {
                     sortedGrupos.sort((a,b) => currentSortDir === 'asc' ? a[1].subtotal - b[1].subtotal : b[1].subtotal - a[1].subtotal);
