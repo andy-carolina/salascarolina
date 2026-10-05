@@ -1811,30 +1811,40 @@
             } catch(err) { mostrarToast(err.message, 'error'); } finally { btnSave.disabled = false; btnSave.innerHTML = iconHTML; }
         }
 
-        async function eliminarPrestamoFila(id) {
-            if(!confirm('¿Estás seguro de eliminar este préstamo? Esta acción no se puede deshacer.')) return;
-            const rowMain = document.getElementById(`row-main-${id}`); 
-            const rowDetails = document.getElementById(`row-details-${id}`);
-            
-            try {
-                const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${id}`, { 
-                    method: 'DELETE', 
-                    headers: { ...AUTH, 'Content-Type': 'application/json' } 
-                });
-                
-                // Si la solicitud falla explícitamente en red
-                if(!res.ok) { 
-                    let errorMsg = 'Error al eliminar.';
-                    try { const errObj = await res.json(); errorMsg = errObj.message || errorMsg; } catch(e){}
-                    throw new Error(errorMsg); 
+            async function eliminarPrestamoFila(id) {
+        // Usar SweetAlert en lugar de confirm() nativo para compatibilidad con Google Sites
+            swal({
+                title: "¿Estás seguro?",
+                text: "Esta acción de eliminar el préstamo no se puede deshacer.",
+                icon: "warning",
+                buttons: ["Cancelar", "Sí, eliminar"],
+                dangerMode: true,
+            }).then(async (willDelete) => {
+                if (willDelete) {
+                    const rowMain = document.getElementById(`row-main-${id}`); 
+                    const rowDetails = document.getElementById(`row-details-${id}`);
+                    
+                    try {
+                        const res = await fetch(`${SB_URL}/prestamos?id_prestamo=eq.${id}`, { 
+                            method: 'DELETE', 
+                            headers: { ...AUTH, 'Content-Type': 'application/json' } 
+                        });
+                        
+                        // Si la solicitud falla explícitamente en red
+                        if(!res.ok) { 
+                            let errorMsg = 'Error al eliminar.';
+                            try { const errObj = await res.json(); errorMsg = errObj.message || errorMsg; } catch(e){}
+                            throw new Error(errorMsg); 
+                        }
+                        
+                        mostrarToast('Préstamo eliminado exitosamente', 'success'); 
+                        if (rowMain) rowMain.remove(); 
+                        if (rowDetails) rowDetails.remove();
+                    } catch(err) { 
+                        mostrarToast(err.message, 'error'); 
+                    }
                 }
-                
-                mostrarToast('Préstamo eliminado exitosamente', 'success'); 
-                if (rowMain) rowMain.remove(); 
-                if (rowDetails) rowDetails.remove();
-            } catch(err) { 
-                mostrarToast(err.message, 'error'); 
-            }
+            });
         }
 
         function formatearFecha(fechaStr) {
