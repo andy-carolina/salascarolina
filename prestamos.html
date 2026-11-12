@@ -12,48 +12,66 @@
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
 
     <!-- Script inicial para evitar flash visual de temas -->
-    <script>
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
+<script>
+    (function () {
+        var THEMES = { 'yotsuba':0, 'yotsuba-b':0, 'tomorrow':0, 'tomorrow-night':1, 'photon':0, 'photon-dark':1 };
+        var t = localStorage.getItem('theme');
+        if (!(t in THEMES)) t = 'yotsuba';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.classList.toggle('dark', !!THEMES[t]);
+    })();
+</script>
 
     <style>
         /* ════════ VARIABLES GLOBALES DE COLOR ════════ */
-        :root {
-            /* MODO CLARO */
-            --bg: #f8fafc; 
-            --surface: #ffffff; 
-            --border: #e2e8f0; 
-            --text: #1e293b; 
-            --muted: #64748b;
-            --input-bg: #f1f5f9; 
-            
-            /* Identidad */
-            --primary: #4A0072; 
-            --primary-hover: #380057; 
-            --accent: #D500F9; 
-            --accent2: #AA00C7;
-            
-            --success: #16a34a; 
-            --danger: #dc2626;
-        }
+        :root, html[data-theme="yotsuba"] {
+    --bg:#ffffee; --surface:#f0e0d6; --border:#d9bfb7; --text:#800000; --muted:#a05a50; --input-bg:#fff8ef;
+    --primary:#800000; --primary-hover:#5e0000; --accent:#af0a0f; --accent2:#cc1105; --on-accent:#ffffff;
+    --success:#117743; --danger:#cc1105;
+}
+html[data-theme="yotsuba-b"] {
+    --bg:#eef2ff; --surface:#d6daf0; --border:#b7c5d9; --text:#000000; --muted:#34345c; --input-bg:#e6ebff;
+    --primary:#34345c; --primary-hover:#22223f; --accent:#0f0c5d; --accent2:#dd0000; --on-accent:#ffffff;
+    --success:#117743; --danger:#dd0000;
+}
+html[data-theme="tomorrow"] {
+    --bg:#ffffff; --surface:#f5f5f5; --border:#d6d6d6; --text:#4d4d4c; --muted:#8e908c; --input-bg:#efefef;
+    --primary:#4271ae; --primary-hover:#325a8c; --accent:#8959a8; --accent2:#4271ae; --on-accent:#ffffff;
+    --success:#718c00; --danger:#c82829;
+}
+html[data-theme="tomorrow-night"] {
+    --bg:#1d1f21; --surface:#282a2e; --border:#373b41; --text:#c5c8c6; --muted:#969896; --input-bg:#222427;
+    --primary:#81a2be; --primary-hover:#6a8aa6; --accent:#b294bb; --accent2:#81a2be; --on-accent:#1d1f21;
+    --success:#b5bd68; --danger:#cc6666;
+}
+html[data-theme="photon"] {
+    --bg:#dddddd; --surface:#f7f7f7; --border:#cccccc; --text:#333333; --muted:#777777; --input-bg:#eeeeee;
+    --primary:#ff6600; --primary-hover:#cc5200; --accent:#ff6600; --accent2:#e65c00; --on-accent:#ffffff;
+    --success:#2e8b2e; --danger:#cc0000;
+}
+html[data-theme="photon-dark"] {
+    --bg:#1a1a1a; --surface:#262626; --border:#3a3a3a; --text:#dddddd; --muted:#999999; --input-bg:#202020;
+    --primary:#ff6600; --primary-hover:#e65c00; --accent:#ff7a1a; --accent2:#ff6600; --on-accent:#ffffff;
+    --success:#4caf50; --danger:#ef5350;
+}
 
-        html.dark {
-            /* MODO OSCURO */
-            --bg: #12021F; 
-            --surface: #1E0635; 
-            --border: #311847; 
-            --text: #FFFFFF; 
-            --muted: #8F829C;
-            --input-bg: #1A032E; 
-            
-            --primary: #FFD700; 
-            --primary-hover: #e6c200; 
-            --accent: #EA80FC; 
-            --accent2: #D500F9;
-        }
+/* Texto sobre botones de acento según el tema (reemplaza los colores fijos de html.dark) */
+.btn-primary, .magic-panel .r-btn, #loginOverlay button { color: var(--on-accent) !important; }
+.img-preview-btn.filled {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
 
+/* Selector de tema */
+.theme-wrap { display:flex; align-items:center; gap:.5rem; margin-left:auto; flex-shrink:0; }
+.theme-select {
+    background: var(--input-bg); color: var(--text); border: 1.5px solid var(--border); border-radius: 999px;
+    padding: .4rem 1.8rem .4rem .8rem; font-size: .72rem; font-weight: 700; cursor: pointer; outline: none;
+    min-height: 36px; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%23888'/></svg>");
+    background-repeat: no-repeat; background-position: right .7rem center;
+}
+.theme-select:focus { border-color: var(--accent); }
         /* ════════ ESTILOS BASE Y COMPONENTES REUTILIZABLES ════════ */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sora', sans-serif; }
         
@@ -373,7 +391,59 @@
             </div>
         </div>
     </div>
+<!-- ══ MODAL GALERÍA DE COMPROBANTES ══ -->
+    <div id="galleryModal" class="modal-overlay hidden" style="background: rgba(0,0,0,0.95);">
+        <div class="absolute inset-0 flex flex-col">
 
+            <!-- Cerrar -->
+            <button onclick="cerrarGaleria()"
+                class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition"
+                title="Cerrar (Esc)">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <!-- Anterior -->
+            <button onclick="galeriaAnterior(event)"
+                class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition"
+                title="Anterior (←)">
+                <i class="fa-solid fa-chevron-left text-lg sm:text-2xl"></i>
+            </button>
+
+            <!-- Siguiente -->
+            <button onclick="galeriaSiguiente(event)"
+                class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition"
+                title="Siguiente (→)">
+                <i class="fa-solid fa-chevron-right text-lg sm:text-2xl"></i>
+            </button>
+
+            <!-- Imagen -->
+            <div class="flex-1 flex items-center justify-center p-4 sm:p-16 overflow-hidden"
+                onclick="if(event.target===this) cerrarGaleria()">
+                <img id="galeriaImagen" src="" alt="Comprobante"
+                    class="max-w-full max-h-full object-contain rounded-lg shadow-2xl select-none">
+            </div>
+
+            <!-- Barra inferior: cuenta / admin / contador -->
+            <div class="bg-black/70 text-white px-4 sm:px-6 py-4 border-t border-white/10">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 max-w-5xl mx-auto w-full">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap gap-x-6 gap-y-1 items-baseline">
+                            <div>
+                                <span class="text-xs opacity-60 uppercase tracking-wider">Admin:</span>
+                                <span id="galeriaAdmin" class="font-bold text-sm">—</span>
+                            </div>
+                            <div>
+                                <span class="text-xs opacity-60 uppercase tracking-wider">Cuenta:</span>
+                                <span id="galeriaCuenta" class="font-mono font-bold text-sm text-[#D500F9]">—</span>
+                            </div>
+                        </div>
+                        <div id="galeriaInfo" class="text-xs opacity-60 mt-1 truncate">—</div>
+                    </div>
+                    <div class="text-sm font-mono opacity-80 whitespace-nowrap" id="galeriaCounter">0 / 0</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- MAIN APP -->
     <div class="app-container">
         
@@ -383,13 +453,16 @@
                 <i class="fa-solid fa-building-columns"></i> PRESTAMOS
             </div>
             <div class="flex items-center gap-2">
-                <div class="dm-switch-wrap">
-                    <span class="dm-label" id="dmLabel">☀️</span>
-                    <label class="dm-toggle" title="Modo oscuro">
-                        <input type="checkbox" id="dmToggle" onchange="toggleDarkMode(this)">
-                        <div class="dm-track"></div>
-                        <div class="dm-knob"></div>
-                    </label>
+                <div class="theme-wrap">
+                    <label for="themeSelect" class="dm-label">Tema</label>
+                    <select id="themeSelect" class="theme-select" onchange="setTheme(this.value)">
+                        <option value="yotsuba">Yotsuba</option>
+                        <option value="yotsuba-b">Yotsuba B</option>
+                        <option value="tomorrow">Tomorrow</option>
+                        <option value="tomorrow-night">Tomorrow Night</option>
+                        <option value="photon">Photon</option>
+                        <option value="photon-dark">Photon Dark</option>
+                    </select>
                 </div>
                 <button class="logout-btn ml-2" onclick="panelLogout()" title="Cerrar sesión">
                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
@@ -417,18 +490,20 @@
                 <div class="r-wrapper">
                     <div class="r-header flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 relative z-10">
                         <div>
-                            <div class="r-tag">MONITOREO</div>
                             <h2>INGRESOS</h2>
                             <p>Préstamos</p>
                         </div>
-                        <div class="flex gap-2 w-full lg:w-auto">
-                            <button onclick="descargarReporteDetalle(event)" class="btn-action btn-green flex-1 lg:flex-none">
-                                <i class="fa-solid fa-file-excel"></i> Detalle
-                            </button>
-                            <button onclick="descargarConsulta(event)" class="btn-action btn-dark flex-1 lg:flex-none">
-                                <i class="fa-solid fa-download"></i> Consulta
-                            </button>
-                        </div>
+                            <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-end">
+                                <button onclick="abrirGaleria(event)" class="btn-action btn-primary flex-1 lg:flex-none" title="Ver comprobantes en galería">
+                                    <i class="fa-solid fa-images"></i> Galería
+                                </button>
+                                <button onclick="descargarReporteDetalle(event)" class="btn-action btn-dark flex-1 lg:flex-none">
+                                    <i class="fa-solid fa-file-excel"></i> Detalle
+                                </button>
+                                <button onclick="descargarConsulta(event)" class="btn-action btn-dark flex-1 lg:flex-none">
+                                    <i class="fa-solid fa-download"></i> Consulta
+                                </button>
+                            </div>
                     </div>
 
                     <div class="r-card mb-5">
@@ -511,7 +586,6 @@
                 <div class="r-wrapper">
                     <div class="r-header flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 relative z-10">
                         <div>
-                            <div class="r-tag">MONITOREO</div>
                             <h2>EGRESOS</h2>
                             <p>Préstamos donde el origen es distinto a la SEDE.</p>
                         </div>
@@ -659,7 +733,7 @@
                                         <input type="hidden" id="reg-cuenta-id">
                                         <div id="reg-cuenta-results" class="s-autocomplete-results"></div>
                                     </div>
-                                    <div id="reg-cuenta-preview" class="text-[13px] font-mono mt-1.5 font-bold tracking-widest text-[var(--accent)] min-h-[18px]"></div>
+                                    <div id="reg-cuenta-preview" class="text-[20px] font-mono mt-1.5 font-bold tracking-widest text-[var(--accent)] min-h-[18px]"></div>
                                 </div>
                                 <div class="r-field">
                                     <label class="r-label">Orden</label>
@@ -884,29 +958,24 @@
         // ==========================
         // DARK MODE TOGGLE (Sincronizado)
         // ==========================
-        function toggleDarkMode(checkbox) {
-            if (checkbox.checked) {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-                document.getElementById('dmLabel').textContent = '🌙';
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-                document.getElementById('dmLabel').textContent = '☀️';
-            }
+        const THEMES = { 'yotsuba':0, 'yotsuba-b':0, 'tomorrow':0, 'tomorrow-night':1, 'photon':0, 'photon-dark':1 };
+
+        function setTheme(t) {
+            if (!(t in THEMES)) t = 'yotsuba';
+            document.documentElement.setAttribute('data-theme', t);
+            document.documentElement.classList.toggle('dark', !!THEMES[t]);
+            localStorage.setItem('theme', t);
+            const sel = document.getElementById('themeSelect');
+            if (sel) sel.value = t;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            const toggle = document.getElementById('dmToggle');
-            const label = document.getElementById('dmLabel');
-            if (toggle) toggle.checked = isDark;
-            if (label) label.textContent = isDark ? '🌙' : '☀️';
-            
+            const t = localStorage.getItem('theme');
+            const sel = document.getElementById('themeSelect');
+            if (sel) sel.value = (t in THEMES) ? t : 'yotsuba';
             checkSession();
         });
+
 
         // ==========================
         // INPUT MONTO FORMATTER
@@ -1256,7 +1325,7 @@
                 
                 const ctaAdmin = p.cuenta && cuentasMap[p.cuenta] ? cuentasMap[p.cuenta].admin : '-';
                 const ctaNum = p.cuenta && cuentasMap[p.cuenta] && cuentasMap[p.cuenta].cuenta ? '***' + cuentasMap[p.cuenta].cuenta.slice(-4) : '';
-                const ctaHTML = ctaAdmin !== '-' ? `<span class="block text-xs font-semibold leading-tight">${ctaAdmin}</span><span class="block text-[10px] font-mono font-bold mt-0.5 text-[var(--accent)]">${ctaNum}</span>` : `<span class="text-xs text-[var(--muted)]">Sin cuenta</span>`;
+                const ctaHTML = ctaAdmin !== '-' ? `<span class="block text-xs font-semibold leading-tight">${ctaAdmin}</span><span class="block text-[15px] font-mono font-bold mt-0.5 text-[var(--accent)]">${ctaNum}</span>` : `<span class="text-xs text-[var(--muted)]">Sin cuenta</span>`;
                 
                 const tdCuenta = isEgresos ? '' : `<td class="t-cell ${hiddenCuentaClass}" data-label="Cuenta">${ctaHTML}</td>`;
                 
@@ -1340,7 +1409,7 @@
             }
 
             htmlGrupos += `
-                <tr class="group-header-row" style="background: var(--primary) !important; color: #fff;">
+                <tr class="group-header-row" style="background: var(--primary) !important; color: var(--on-accent);">
                     <td colspan="${colSpanGroup}" class="t-cell text-right uppercase tracking-wider" style="color: inherit; border:none;">Total General (${data.length} reg):</td>
                     <td class="t-cell text-right monto-oscuro" style="color: inherit !important; border:none;">${formatearMonto(totalGeneral)}</td>
                     <td colspan="3" class="hidden md:table-cell t-cell" style="border:none;"></td>
@@ -1529,6 +1598,91 @@
             swal({ content: img, className: "swal-large-image", buttons: { cancel: { text: "Cerrar", value: null, visible: true, className: "btn-light" }, catch: { text: "Abrir original", value: "open", className: "btn-primary" } }
             }).then((value) => { if (value === "open") window.open(url, '_blank'); });
         }
+        let galeriaItems = [];
+        let galeriaIndex = 0;
+
+        function abrirGaleria(e) {
+            if (e) e.preventDefault();
+
+            // Recolecta todas las imágenes existentes del dataset actual
+            galeriaItems = [];
+            if (Array.isArray(window.currentData)) {
+                window.currentData.forEach(p => {
+                    if (p.img)  galeriaItems.push({ url: p.img,  prestamo: p, tipo: 'IMG 1' });
+                    if (p.img2) galeriaItems.push({ url: p.img2, prestamo: p, tipo: 'IMG 2' });
+                });
+            }
+
+            if (galeriaItems.length === 0) {
+                mostrarToast('No hay comprobantes para mostrar', 'error');
+                return;
+            }
+
+            galeriaIndex = 0;
+            document.getElementById('galleryModal').classList.remove('hidden');
+            mostrarImagenGaleria();
+        }
+
+        function cerrarGaleria() {
+            document.getElementById('galleryModal').classList.add('hidden');
+            document.getElementById('galeriaImagen').src = '';
+            galeriaItems = [];
+            galeriaIndex = 0;
+        }
+
+        function galeriaSiguiente(e) {
+            if (e) e.stopPropagation();
+            if (galeriaItems.length === 0) return;
+            galeriaIndex = (galeriaIndex + 1) % galeriaItems.length;
+            mostrarImagenGaleria();
+        }
+
+        function galeriaAnterior(e) {
+            if (e) e.stopPropagation();
+            if (galeriaItems.length === 0) return;
+            galeriaIndex = (galeriaIndex - 1 + galeriaItems.length) % galeriaItems.length;
+            mostrarImagenGaleria();
+        }
+
+        function mostrarImagenGaleria() {
+            if (galeriaItems.length === 0) return;
+            const item = galeriaItems[galeriaIndex];
+            const p    = item.prestamo;
+
+            document.getElementById('galeriaImagen').src = item.url;
+
+            // ── Cuenta / Admin desde cuentasMap ──
+            let admin  = '—';
+            let cuenta = '—';
+            if (p.cuenta && cuentasMap[p.cuenta]) {
+                admin  = cuentasMap[p.cuenta].admin  || '—';
+                cuenta = cuentasMap[p.cuenta].cuenta || '—';
+            }
+            document.getElementById('galeriaAdmin').textContent  = admin;
+            document.getElementById('galeriaCuenta').textContent = cuenta;
+
+            // ── Info contextual ──
+            const fecha  = formatearFecha(p.fecha);
+            const origen = p.origen?.nombre_sala || 'SEDE';
+            const sala   = p.sala?.nombre_sala   || '—';
+            const monto  = formatearMonto(p.monto);
+            document.getElementById('galeriaInfo').textContent =
+                `${fecha} · ${origen} → ${sala} · ${monto} · ${item.tipo}`;
+
+            document.getElementById('galeriaCounter').textContent =
+                `${galeriaIndex + 1} / ${galeriaItems.length}`;
+        }
+
+        // Atajos de teclado (←  →  Esc)
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('galleryModal');
+            if (!modal || modal.classList.contains('hidden')) return;
+            if (e.key === 'ArrowRight') { e.preventDefault(); galeriaSiguiente(); }
+            if (e.key === 'ArrowLeft')  { e.preventDefault(); galeriaAnterior(); }
+            if (e.key === 'Escape')     { e.preventDefault(); cerrarGaleria(); }
+        });
+
+
 
         async function actualizarConteoDashboard(id, nuevaFecha) {
             try {
